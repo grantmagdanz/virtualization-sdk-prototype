@@ -103,42 +103,36 @@ class TestCli:
             cli.get_console_logging_level(1, 1)
 
     @staticmethod
-    @mock.patch("dlpx.virtualization._internal.commands.initialize.init")
+    @mock.patch('dlpx.virtualization._internal.commands.initialize.init')
     def test_command_user_error(mock_init, plugin_name):
         runner = click_testing.CliRunner()
 
         mock_init.side_effect = exceptions.UserError("codegen_error")
-        result = runner.invoke(cli.delphix_sdk, ["init", "-n", plugin_name])
+        result = runner.invoke(cli.delphix_sdk, ['init', '-n', plugin_name])
 
         assert result.exit_code == 1
-        assert result.output == "codegen_error\n"
+        assert result.output == 'codegen_error\n'
 
         # 'DIRECT' and os.getcwd() are the expected defaults
-        mock_init.assert_called_once_with(
-            os.getcwd(),
-            util_classes.DIRECT_TYPE,
-            plugin_name,
-            util_classes.UNIX_HOST_TYPE,
-        )
+        mock_init.assert_called_once_with(os.getcwd(),
+                                          util_classes.DIRECT_TYPE,
+                                          plugin_name)
 
     @staticmethod
-    @mock.patch("dlpx.virtualization._internal.commands.initialize.init")
+    @mock.patch('dlpx.virtualization._internal.commands.initialize.init')
     def test_command_non_user_error(mock_init, plugin_name):
         runner = click_testing.CliRunner()
 
         mock_init.side_effect = Exception("internal_error")
-        result = runner.invoke(cli.delphix_sdk, ["init", "-n", plugin_name])
+        result = runner.invoke(cli.delphix_sdk, ['init', '-n', plugin_name])
 
         assert result.exit_code == 2
-        assert "Internal error, please contact Delphix.\n" in result.output
+        assert 'Internal error, please contact Delphix.\n' in result.output
 
         # 'DIRECT' and os.getcwd() are the expected defaults
-        mock_init.assert_called_once_with(
-            os.getcwd(),
-            util_classes.DIRECT_TYPE,
-            plugin_name,
-            util_classes.UNIX_HOST_TYPE,
-        )
+        mock_init.assert_called_once_with(os.getcwd(),
+                                          util_classes.DIRECT_TYPE,
+                                          plugin_name)
 
 
 class TestInitCli:

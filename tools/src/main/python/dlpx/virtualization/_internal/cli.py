@@ -52,7 +52,7 @@ def command_error_handler():
         exit(1)
     except Exception as err:
         logger.debug(err)
-        logger.error("Internal error, please contact Delphix.")
+        logger.error('Internal error, please contact Delphix.')
         exit(2)
 
 

@@ -66,13 +66,10 @@ def format_entry_point_template(entry_point_template):
             operations = operations.render(default_mount_path=default_mount_path)
         else:
             raise RuntimeError(
-                "Got unrecognized ingestion strategy: {}".format(ingestion_strategy)
-            )
-        return template.render(
-            name=repr(plugin_name),
-            linked_operations=operations,
-            default_mount_path=default_mount_path,
-        )
+                'Got unrecognized ingestion strategy: {}'.format(
+                    ingestion_strategy))
+        return template.render(name=repr(plugin_name),
+                               linked_operations=operations)
 
     return format_template
 

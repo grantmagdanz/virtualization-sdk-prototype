@@ -27,13 +27,11 @@ def upload(engine, user, upload_artifact, password):
         HttpError
         UnexpectedError
     """
-    logger.debug(
-        "Upload parameters include"
-        " engine: {},"
-        " user: {},"
-        " upload_artifact: {}".format(engine, user, upload_artifact)
-    )
-    logger.info("Uploading plugin artifact {} ...".format(upload_artifact))
+    logger.debug('Upload parameters include'
+                 ' engine: {},'
+                 ' user: {},'
+                 ' upload_artifact: {}'.format(engine, user, upload_artifact))
+    logger.info('Uploading plugin artifact {} ...'.format(upload_artifact))
 
     # Read content of upload artifact
     try:
@@ -48,11 +46,10 @@ def upload(engine, user, upload_artifact, password):
                 )
     except IOError as err:
         raise exceptions.UserError(
-            "Unable to read upload artifact file '{}'"
-            "\nError code: {}. Error message: {}".format(
-                upload_artifact, err.errno, errno.errorcode.get(err.errno, UNKNOWN_ERR)
-            )
-        )
+            'Unable to read upload artifact file \'{}\''
+            '\nError code: {}. Error message: {}'.format(
+                upload_artifact, err.errno,
+                errno.errorcode.get(err.errno, UNKNOWN_ERR)))
 
     # Create a new delphix session.
     client = delphix_client.DelphixClient(engine)

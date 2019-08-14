@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "829ea89a26e35ce5354f9967f5d90719845426bc5bfd180f96d3b1c8b1172b96"
+            "sha256": "c3bbc28e554c9807e726a662a3d616474e66e5f3e597656d50baea07b823786c"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -15,8 +15,8 @@
     },
     "default": {
         "dvp-common": {
-            "path": "../common/build/python-dist/dvp-common-1.0.1-internal-002.tar.gz",
-            "version": "== 1.0.1-internal-002"
+            "path": "../common/build/python-dist/dvp-common-1.0.1-internal-001.tar.gz",
+            "version": "== 1.0.1-internal-001"
         },
         "enum34": {
             "hashes": [

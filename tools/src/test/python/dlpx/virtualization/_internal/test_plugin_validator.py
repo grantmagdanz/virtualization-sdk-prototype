@@ -55,11 +55,9 @@ class TestPluginValidator:
             validator.validate()
 
         message = err_info.value.message
-        assert (
-            "Failed to load schemas because {} is not a valid json file."
-            " Error: Extra data: line 2 column 1 - line 2 column 9"
-            " (char 19 - 27)".format(schema_file)
-        ) in message
+        assert ('Failed to load schemas because {} is not a valid json file.'
+                ' Error: Extra data: line 2 column 1 - line 2 column 9'
+                ' (char 19 - 27)'.format(schema_file)) in message
 
     @staticmethod
     def test_plugin_bad_config_file(plugin_config_file):

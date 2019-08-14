@@ -25,14 +25,14 @@ class UserError(Exception):
 class PathDoesNotExistError(UserError):
     def __init__(self, path):
         self.path = path
-        message = "The path '{}' does not exist.".format(path)
+        message = 'The path \'{}\' does not exist.'.format(path)
         super(PathDoesNotExistError, self).__init__(message)
 
 
 class PathExistsError(UserError):
     def __init__(self, path):
         self.path = path
-        message = "The path '{}' already exists.".format(path)
+        message = 'The path \'{}\' already exists.'.format(path)
         super(PathExistsError, self).__init__(message)
 
 
@@ -40,7 +40,8 @@ class PathTypeError(UserError):
     def __init__(self, path, path_type):
         self.path = path
         self.path_type = path_type
-        message = "The path {} should be a {} but is not.".format(path, path_type)
+        message = 'The path {} should be a {} but is not.'.format(
+            path, path_type)
         super(PathTypeError, self).__init__(message)
 
 
@@ -168,9 +169,9 @@ class SchemaValidationError(UserError):
         formatted_errors = self.__format_errors(validation_errors)
         error_msg = "\n".join(formatted_errors)
 
-        message = "{}\n\nValidation failed on {}. \n{} Warning(s). {} Error(s)".format(
-            error_msg, self.schema_file, 0, len(formatted_errors)
-        )
+        message = (
+            '{}\n\nValidation failed on {}. \n{} Warning(s). {} Error(s)'.
+            format(error_msg, self.schema_file, 0, len(formatted_errors)))
         super(SchemaValidationError, self).__init__(message)
 
     @staticmethod
@@ -188,7 +189,8 @@ class SchemaValidationError(UserError):
             # get the error string based on those errors.
             #
             if err.context:
-                nested_errors = SchemaValidationError.__format_errors(err.context)
+                nested_errors = SchemaValidationError.__format_errors(
+                    err.context)
                 all_errors.extend(nested_errors)
 
         return all_errors
@@ -230,9 +232,8 @@ class SchemaValidationError(UserError):
         err_msg = re.compile(r"\bu\b", re.IGNORECASE)
         err_msg = err_msg.sub("", err.message)
 
-        error_string = "Error: {} on {}".format(
-            err_msg, map(str, list(err.schema_path))
-        )
+        error_string = 'Error: {} on {}'.format(
+            err_msg, map(str, list(err.schema_path)))
 
         return error_string
 
