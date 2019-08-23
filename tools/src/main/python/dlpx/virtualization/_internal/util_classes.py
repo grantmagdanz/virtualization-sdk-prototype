@@ -5,10 +5,10 @@
 import enum
 import os
 
-UNIX_HOST_TYPE = "UNIX"
-WINDOWS_HOST_TYPE = "WINDOWS"
-STAGED_TYPE = "STAGED"
-DIRECT_TYPE = "DIRECT"
+UNIX_HOST_TYPE = 'UNIX'
+WINDOWS_HOST_TYPE = 'WINDOWS'
+STAGED_TYPE = 'STAGED'
+DIRECT_TYPE = 'DIRECT'
 
 OUTPUT_DIR_NAME = ".dvp-gen-output"
 PLUGIN_SCHEMAS_DIR = os.path.join(os.path.dirname(__file__), "validation_schemas")

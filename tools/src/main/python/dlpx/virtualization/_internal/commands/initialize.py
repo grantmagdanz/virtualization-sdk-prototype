@@ -55,16 +55,14 @@ def init(root, ingestion_strategy, name, host_type):
         name (str): The name of the plugin to display.
         host_type (list of str): The host type supported by the plugin
     """
-    logger.info("Initializing directory: %s", root)
+    logger.info('Initializing directory: %s', root)
     logger.debug(
-        "init parameters: %s",
-        {
-            "Root": root,
-            "Ingestion Strategy": ingestion_strategy,
-            "Name": name,
-            "Host Types": host_type,
-        },
-    )
+        'init parameters: %s', {
+            'Root': root,
+            'Ingestion Strategy': ingestion_strategy,
+            'Name': name,
+            'Host Types': host_type
+        })
 
     # Files paths based on 'root' to be used throughout
     src_dir_path = os.path.join(root, DEFAULT_SRC_DIRECTORY)
@@ -132,7 +130,7 @@ def init(root, ingestion_strategy, name, host_type):
             config = _get_default_plugin_config(plugin_id, ingestion_strategy,
                                                 name, DEFAULT_ENTRY_POINT,
                                                 DEFAULT_SRC_DIRECTORY,
-                                                DEFAULT_SCHEMA_FILE)
+                                                DEFAULT_SCHEMA_FILE, host_type)
             yaml.dump(config, f, default_flow_style=False)
 
         #
@@ -143,8 +141,7 @@ def init(root, ingestion_strategy, name, host_type):
         logger.info('Writing entry file at %s.', entry_point_file_path)
         with open(entry_point_file_path, 'w+') as f:
             entry_point_content = _get_entry_point_contents(
-                plugin_id, ingestion_strategy, host_type
-            )
+                plugin_id, ingestion_strategy, host_type)
             f.write(entry_point_content)
 
     except Exception as e:
@@ -182,30 +179,22 @@ def _get_entry_point_contents(plugin_name, ingestion_strategy, host_type):
     if ingestion_strategy == util_classes.DIRECT_TYPE:
         linked_operations = env.get_template(DIRECT_OPERATIONS_TEMPLATE_NAME).render()
     elif ingestion_strategy == util_classes.STAGED_TYPE:
-        linked_operations = env.get_template(STAGED_OPERATIONS_TEMPLATE_NAME).render(
-            default_mount_path=default_mount_path
-        )
+        linked_operations = env.get_template(
+            STAGED_OPERATIONS_TEMPLATE_NAME).render(
+                default_mount_path=default_mount_path)
     else:
         raise RuntimeError('Got unrecognized ingestion strategy: {}'.format(
             ingestion_strategy))
 
     # Call 'repr' to put the string in quotes and escape quotes.
-    return template.render(
-        name=repr(plugin_name),
-        linked_operations=linked_operations,
-        default_mount_path=default_mount_path,
-    )
+    return template.render(name=repr(plugin_name),
+                           linked_operations=linked_operations,
+                           default_mount_path=default_mount_path)
 
 
-def _get_default_plugin_config(
-    plugin_id,
-    ingestion_strategy,
-    name,
-    entry_point,
-    src_dir_path,
-    schema_file_path,
-    host_type,
-):
+def _get_default_plugin_config(plugin_id, ingestion_strategy, name,
+                               entry_point, src_dir_path, schema_file_path,
+                               host_type):
     """
     Returns a valid plugin configuration as an OrderedDict.
 
@@ -225,19 +214,13 @@ def _get_default_plugin_config(
     """
     # Ensure values are type 'str'. If they are type unicode yaml prints
     # them with '!!python/unicode' prepended to the value.
-    config = OrderedDict(
-        [
-            ("id", plugin_id.encode("utf-8")),
-            ("name", name.encode("utf-8")),
-            ("version", "0.1.0"),
-            ("language", "PYTHON27"),
-            ("hostTypes", ["UNIX"]),
-            ("pluginType", ingestion_strategy.encode("utf-8")),
-            ("entryPoint", entry_point.encode("utf-8")),
-            ("srcDir", src_dir_path.encode("utf-8")),
-            ("schemaFile", schema_file_path.encode("utf-8")),
-            ("hostTypes", [host_type.encode("utf-8")]),
-        ]
-    )
+    config = OrderedDict([('id', plugin_id.encode('utf-8')),
+                          ('name', name.encode('utf-8')), ('version', '0.1.0'),
+                          ('language', 'PYTHON27'), ('hostTypes', ['UNIX']),
+                          ('pluginType', ingestion_strategy.encode('utf-8')),
+                          ('entryPoint', entry_point.encode('utf-8')),
+                          ('srcDir', src_dir_path.encode('utf-8')),
+                          ('schemaFile', schema_file_path.encode('utf-8')),
+                          ('hostTypes', [host_type.encode('utf-8')])])
 
     return config

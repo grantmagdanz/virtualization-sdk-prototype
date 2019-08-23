@@ -116,7 +116,8 @@ class TestCli:
         # 'DIRECT' and os.getcwd() are the expected defaults
         mock_init.assert_called_once_with(os.getcwd(),
                                           util_classes.DIRECT_TYPE,
-                                          plugin_name)
+                                          plugin_name,
+                                          util_classes.UNIX_HOST_TYPE)
 
     @staticmethod
     @mock.patch('dlpx.virtualization._internal.commands.initialize.init')
@@ -132,7 +133,8 @@ class TestCli:
         # 'DIRECT' and os.getcwd() are the expected defaults
         mock_init.assert_called_once_with(os.getcwd(),
                                           util_classes.DIRECT_TYPE,
-                                          plugin_name)
+                                          plugin_name,
+                                          util_classes.UNIX_HOST_TYPE)
 
 
 class TestInitCli:
@@ -146,12 +148,10 @@ class TestInitCli:
         assert result.exit_code == 0, "Output: {}".format(result.output)
 
         # 'DIRECT' and os.getcwd() are the expected defaults
-        mock_init.assert_called_once_with(
-            os.getcwd(),
-            util_classes.DIRECT_TYPE,
-            plugin_name,
-            util_classes.UNIX_HOST_TYPE,
-        )
+        mock_init.assert_called_once_with(os.getcwd(),
+                                          util_classes.DIRECT_TYPE,
+                                          plugin_name,
+                                          util_classes.UNIX_HOST_TYPE)
 
     @staticmethod
     @mock.patch("dlpx.virtualization._internal.commands.initialize.init")
@@ -163,13 +163,11 @@ class TestInitCli:
             ["init", "-s", util_classes.STAGED_TYPE, "-r", ".", "-n", plugin_name],
         )
 
-        assert result.exit_code == 0, "Output: {}".format(result.output)
-        mock_init.assert_called_once_with(
-            os.getcwd(),
-            util_classes.STAGED_TYPE,
-            plugin_name,
-            util_classes.UNIX_HOST_TYPE,
-        )
+        assert result.exit_code == 0, 'Output: {}'.format(result.output)
+        mock_init.assert_called_once_with(os.getcwd(),
+                                          util_classes.STAGED_TYPE,
+                                          plugin_name,
+                                          util_classes.UNIX_HOST_TYPE)
 
     @staticmethod
     def test_invalid_ingestion_strategy(plugin_name):
@@ -193,42 +191,33 @@ class TestInitCli:
     def test_multiple_host_types():
         runner = click_testing.CliRunner()
 
-        result = runner.invoke(
-            cli.delphix_sdk,
-            [
-                "init",
-                "-t",
-                "{},{}".format(
-                    util_classes.UNIX_HOST_TYPE, util_classes.WINDOWS_HOST_TYPE
-                ),
-            ],
-        )
+        result = runner.invoke(cli.delphix_sdk, [
+            'init', '-t', '{},{}'.format(util_classes.UNIX_HOST_TYPE,
+                                         util_classes.WINDOWS_HOST_TYPE)
+        ])
 
         assert result.exit_code != 0
         assert "invalid choice" in result.output
 
     @staticmethod
-    @mock.patch("dlpx.virtualization._internal.commands.initialize.init")
+    @mock.patch('dlpx.virtualization._internal.commands.initialize.init')
     def test_windows_host_type(mock_init, plugin_name):
         runner = click_testing.CliRunner()
 
         result = runner.invoke(
             cli.delphix_sdk,
-            ["init", "-n", plugin_name, "-t", util_classes.WINDOWS_HOST_TYPE],
-        )
-        assert result.exit_code == 0, "Output: {}".format(result.output)
-        mock_init.assert_called_once_with(
-            os.getcwd(),
-            util_classes.DIRECT_TYPE,
-            plugin_name,
-            util_classes.WINDOWS_HOST_TYPE,
-        )
+            ['init', '-n', plugin_name, '-t', util_classes.WINDOWS_HOST_TYPE])
+        assert result.exit_code == 0, 'Output: {}'.format(result.output)
+        mock_init.assert_called_once_with(os.getcwd(),
+                                          util_classes.DIRECT_TYPE,
+                                          plugin_name,
+                                          util_classes.WINDOWS_HOST_TYPE)
 
     @staticmethod
     def test_invalid_host_type():
         runner = click_testing.CliRunner()
 
-        result = runner.invoke(cli.delphix_sdk, ["init", "-t", "UNI"])
+        result = runner.invoke(cli.delphix_sdk, ['init', '-t', 'UNI'])
 
         assert result.exit_code != 0
         assert "invalid choice" in result.output

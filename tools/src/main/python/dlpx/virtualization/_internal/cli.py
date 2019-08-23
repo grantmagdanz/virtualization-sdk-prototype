@@ -125,23 +125,19 @@ def delphix_sdk(verbose, quiet):
     "--ingestion-strategy",
     default=util_classes.DIRECT_TYPE,
     show_default=True,
-    type=click.Choice(
-        [util_classes.DIRECT_TYPE, util_classes.STAGED_TYPE], case_sensitive=False
-    ),
-    help=(
-        'Set the ingestion strategy of the plugin. A "direct" plugin '
-        'ingests without a staging server while a "staged" plugin '
-        "requires a staging server."
-    ),
-)
-@click.option(
-    "-t",
-    "--host-type",
-    default=util_classes.UNIX_HOST_TYPE,
-    show_default=True,
-    type=click.Choice([util_classes.UNIX_HOST_TYPE, util_classes.WINDOWS_HOST_TYPE]),
-    help="Set the host platform supported by the plugin.",
-)
+    type=click.Choice([util_classes.DIRECT_TYPE, util_classes.STAGED_TYPE],
+                      case_sensitive=False),
+    help=('Set the ingestion strategy of the plugin. A "direct" plugin '
+          'ingests without a staging server while a "staged" plugin '
+          'requires a staging server.'))
+@click.option('-t',
+              '--host-type',
+              default=util_classes.UNIX_HOST_TYPE,
+              show_default=True,
+              type=click.Choice([
+                  util_classes.UNIX_HOST_TYPE, util_classes.WINDOWS_HOST_TYPE
+              ]),
+              help='Set the host platform supported by the plugin.')
 def init(root, ingestion_strategy, name, host_type):
     """
     Create a plugin in the root directory. The plugin will be valid
