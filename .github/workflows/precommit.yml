@@ -98,9 +98,10 @@ jobs:
     name: Check format ${{ matrix.package}}
     
     runs-on: ubuntu-latest
-    max-parallel: 4
-    matrix:
-      package: [common, libs, platform, tools]
+    strategy:
+      max-parallel: 4
+      matrix:
+        package: [common, libs, platform, tools]
       
     steps:
       - name: Check src format
