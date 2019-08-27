@@ -105,13 +105,12 @@ jobs:
       
     steps:
       - name: Check src format
-        working-directory: ${{ matrix.package }}
         uses: lgeiger/black-action@v1.0.1
         with:
-          args: "src/main/python -t py27 --check"
+          args: "${{ matrix.package }}/src/main/python -t py27 --check"
      
       - name: Check test format
         working-directory: ${{ matrix.package }}
         uses: lgeiger/black-action@v1.0.1
         with:
-          args: "src/test/python -t py27 --check"
+          args: "${{ matrix.package }}/src/test/python -t py27 --check"
