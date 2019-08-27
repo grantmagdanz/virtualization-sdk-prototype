@@ -19,11 +19,11 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
         
-    - name: Test (no working dir)
+    - name: Test - no working dir
       run: |
       pwd && env
       
-    - name: Test (working dir)
+    - name: Test - working dir
       working-directory: $GITHUB_WORKSPACE/virtualization-sdk/virtualization-sdk/tools
       run: |
       pwd && env
