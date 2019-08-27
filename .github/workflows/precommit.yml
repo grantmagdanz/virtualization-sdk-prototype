@@ -6,11 +6,12 @@ jobs:
   test-tools:
     name: Test the dvp-tools package
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 4
       matrix:
         python-version: [2.7]
+        os: [ubuntu-latest, windows-latest, macOS-latest]
 
     steps:
     - uses: actions/checkout@v1
