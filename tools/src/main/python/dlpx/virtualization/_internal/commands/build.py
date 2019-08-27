@@ -10,6 +10,7 @@ import logging
 import os
 import StringIO
 import zipfile
+import shutil
 
 from dlpx.virtualization._internal import (codegen, exceptions, file_util,
                                            package_util, plugin_util,
@@ -113,9 +114,22 @@ def build(plugin_config, upload_artifact, generate_only, skip_id_validation):
             logger.warn('{}\n{} Warning(s). {} Error(s).'.format(
                 warning_msg, len(result.warnings['warning']), 0))
 
+    from pip._internal import main as pip
+
+    root = os.path.dirname(plugin_config)
+    build_dir = os.path.join(root, 'build')
+    build_src_dir = os.path.join(build_dir, os.path.basename(src_dir))
+
+    logger.debug("Deleting {}".format(build_src_dir))
+    shutil.rmtree(build_src_dir)
+
+    shutil.copytree(src_dir, build_src_dir)
+
+    pip(['install', '-t', build_dir, 'dvp'])
+
     # Prepare the output artifact.
     try:
-        plugin_output = prepare_upload_artifact(plugin_config_content, src_dir,
+        plugin_output = prepare_upload_artifact(plugin_config_content,build_dir,
                                                 schemas, plugin_manifest)
     except exceptions.UserError as err:
         raise exceptions.BuildFailedError(err)
