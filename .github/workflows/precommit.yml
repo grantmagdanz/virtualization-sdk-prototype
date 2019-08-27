@@ -32,7 +32,7 @@ jobs:
         pip install pytest
         PYTHONPATH=src/main/python pytest src/test/python/
         
-jobs:
+
   test-libs:
     name: Test the dvp-libs package
 
@@ -62,7 +62,7 @@ jobs:
         pip install pytest
         PYTHONPATH=src/main/python pytest src/test/python/
 
-jobs:
+
   test-platform:
     name: Test the dvp-platform package
 
@@ -92,7 +92,7 @@ jobs:
         pip install pytest
         PYTHONPATH=src/main/python pytest src/test/python/
 
-jobs:
+
   test-common:
     name: Test the dvp-common package
 
