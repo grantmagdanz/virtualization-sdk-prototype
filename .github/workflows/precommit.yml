@@ -23,8 +23,8 @@ jobs:
       run: pwd && env
       
     - name: Test - working dir
-      working-directory: $GITHUB_WORKSPACE/virtualization-sdk/virtualization-sdk/tools
-      run: pwd && env
+      working-directory: tools
+      run: pwd
         
     - name: Build local dependencies
       working-directory: $GITHUB_WORKSPACE/virtualization-sdk/virtualization-sdk/tools
