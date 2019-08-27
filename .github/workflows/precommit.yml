@@ -1,6 +1,6 @@
 name: Pre-commit
 
-on: pull_request
+on: [issues, pull_request]
 
 jobs:
   test-libs:
