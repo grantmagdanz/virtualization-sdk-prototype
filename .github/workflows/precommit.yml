@@ -19,18 +19,28 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
         
+    - name: Test (no working dir)
+      run: |
+      pwd && env
+      
+    - name: Test (working dir)
+      working-directory: $GITHUB_WORKSPACE/virtualization-sdk/virtualization-sdk/tools
+      run: |
+      pwd && env
+        
     - name: Build local dependencies
-      working-directory: $GITHUB_WORKSPACE/virtualization-sdk/tools
+      working-directory: $GITHUB_WORKSPACE/virtualization-sdk/virtualization-sdk/tools
       run: |
         ./gradlew 
         
     - name: Install dependencies
-      working-directory: $GITHUB_WORKSPACE/virtualization-sdk/tools
+      working-directory: $GITHUB_WORKSPACE/virtualization-sdk/virtualization-sdk/tools
       run: |
         python -m pip install --upgrade pip
         pip install -r lock.requirements.txt -r lock.dev-requirements.txt
+        
     - name: Test with pytest
-      working-directory: $GITHUB_WORKSPACE/virtualization-sdk/tools
+      working-directory: $GITHUB_WORKSPACE/virtualization-sdk/virtualization-sdk/tools
       run: |
         pip install pytest
         PYTHONPATH=src/main/python pytest src/test/python/
