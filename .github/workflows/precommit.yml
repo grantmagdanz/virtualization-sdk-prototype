@@ -12,7 +12,7 @@ jobs:
         python-version: [2.7]
 
     steps:
-    - working-directory: $GITHUB_WORKSPACE/virtualization-sdk/tools
+      working-directory: $GITHUB_WORKSPACE/virtualization-sdk/tools
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1
