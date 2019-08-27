@@ -1,4 +1,3 @@
--i https://artifactory.delphix.com/artifactory/api/pypi/delphix-virtual-pypi/simple/
 atomicwrites==1.3.0
 attrs==19.1.0
 configparser==3.7.4 ; python_version < '3'
