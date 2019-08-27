@@ -20,7 +20,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r libs/lock.dev-requirements.txt
+        pip install -r libs/lock.requirements.txt -r libs/lock.dev-requirements.txt
     - name: Test with pytest
       run: |
         pip install pytest
