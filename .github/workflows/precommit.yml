@@ -106,8 +106,10 @@ jobs:
     steps:
       - name: Check src format
         uses: lgeiger/black-action@v1.0.1
-        args: "src/main/python -t py27 --check"
+        with:
+          args: "src/main/python -t py27 --check"
      
       - name: Check test format
         uses: lgeiger/black-action@v1.0.1
-        args: "src/test/python -t py27 --check"
+        with:
+          args: "src/test/python -t py27 --check"
