@@ -57,11 +57,11 @@ jobs:
         
       - name: Run flake8 on src directory
         working-directory: ${{ matrix.package }}
-        run: python -m flake8 src/main/python
+        run: python -m flake8 --ignore=E501 src/main/python
     
       - name: Run flake8 on test directory
         working-directory: ${{ matrix.package }}
-        run: python -m flake8 test/main/python
+        run: python -m flake8 --ignore=E501 test/main/python
       
   format:
     name: Check format ${{ matrix.package}}
