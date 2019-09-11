@@ -13,17 +13,14 @@ import subprocess
 from dlpx.virtualization._internal import exceptions, file_util, util_classes
 
 logger = logging.getLogger(__name__)
-UNKNOWN_ERR = 'UNKNOWN_ERR'
+UNKNOWN_ERR = "UNKNOWN_ERR"
 
 # The Swagger JSON specification requires these following fields.
 SWAGGER_JSON_FORMAT = {
-    'swagger': '2.0',
-    'info': {
-        'version': '1.0.0',
-        'title': None
-    },
-    'paths': {},
-    'definitions': {}
+    "swagger": "2.0",
+    "info": {"version": "1.0.0", "title": None},
+    "paths": {},
+    "definitions": {},
 }
 
 #
@@ -33,24 +30,20 @@ SWAGGER_JSON_FORMAT = {
 #
 
 SNAPSHOT_PARAMS_JSON = {
-    'snapshotParametersDefinition': {
-        'type': 'object',
-        'additionalProperties': False,
-        'properties': {
-            'resync': {
-                'type': 'boolean'
-            }
-        }
+    "snapshotParametersDefinition": {
+        "type": "object",
+        "additionalProperties": False,
+        "properties": {"resync": {"type": "boolean"}},
     }
 }
 
-SWAGGER_FILE_NAME = 'swagger.json'
-CODEGEN_PACKAGE = 'generated'
-CODEGEN_MODULE = 'definitions'
-SWAGGER_JAR = 'codegen/swagger-codegen-cli-2.3.1.jar'
-CODEGEN_CONFIG = 'codegen/codegen-config.json'
-CODEGEN_TEMPLATE_DIR = 'codegen/templates'
-CODEGEN_COPY_FILES = ['__init__.py', 'util.py', CODEGEN_MODULE]
+SWAGGER_FILE_NAME = "swagger.json"
+CODEGEN_PACKAGE = "generated"
+CODEGEN_MODULE = "definitions"
+SWAGGER_JAR = "codegen/swagger-codegen-cli-2.3.1.jar"
+CODEGEN_CONFIG = "codegen/codegen-config.json"
+CODEGEN_TEMPLATE_DIR = "codegen/templates"
+CODEGEN_COPY_FILES = ["__init__.py", "util.py", CODEGEN_MODULE]
 
 
 def generate_python(name, source_dir, plugin_config_dir, schema_content):
@@ -78,14 +71,14 @@ def generate_python(name, source_dir, plugin_config_dir, schema_content):
     # recreated.
     #
     output_dir = os.path.join(plugin_config_dir, util_classes.OUTPUT_DIR_NAME)
-    logger.info('Creating new output directory: {!r}'.format(output_dir))
+    logger.info("Creating new output directory: {}".format(output_dir))
     file_util.make_dir(output_dir, True)
 
     #
     # Create the json with the correct Swagger JSON specification required to
     # generate the objects. Write it to the output dir that we created above.
     #
-    logger.info('Writing the swagger file in {!r}'.format(output_dir))
+    logger.info("Writing the swagger file in {}".format(output_dir))
     swagger_file = _write_swagger_file(name, schema_content, output_dir)
 
     #
@@ -93,8 +86,10 @@ def generate_python(name, source_dir, plugin_config_dir, schema_content):
     # the schemas specified in the json. Run the jar making it write to the
     # output_dir again.
     #
-    logger.info('Executing swagger codegen generate with'
-                ' swagger file {!r}'.format(swagger_file))
+    logger.info(
+        "Executing swagger codegen generate with"
+        " swagger file {}".format(swagger_file)
+    )
     _execute_swagger_codegen(swagger_file, output_dir)
 
     #
@@ -103,25 +98,26 @@ def generate_python(name, source_dir, plugin_config_dir, schema_content):
     # `from swagger_client.generate` etc... If this works than the python
     # classes were generated properly.
     #
-    logger.info('Copying generated python files to'
-                ' source directory {!r}'.format(source_dir))
+    logger.info(
+        "Copying generated python files to" " source directory {}".format(source_dir)
+    )
     _copy_generated_to_dir(output_dir, source_dir)
 
 
 def _write_swagger_file(name, schema_dict, output_dir):
     swagger_json = copy.deepcopy(SWAGGER_JSON_FORMAT)
-    swagger_json['info']['title'] = name
-    swagger_json['definitions'] = copy.deepcopy(schema_dict)
+    swagger_json["info"]["title"] = name
+    swagger_json["definitions"] = copy.deepcopy(schema_dict)
     # Add in the snapshot param definition
-    swagger_json['definitions'].update(SNAPSHOT_PARAMS_JSON)
+    swagger_json["definitions"].update(SNAPSHOT_PARAMS_JSON)
 
     swagger_file = os.path.join(output_dir, SWAGGER_FILE_NAME)
-    logger.info('Writing swagger file to {!r}'.format(swagger_file))
+    logger.info("Writing swagger file to {}".format(swagger_file))
     #
     # Dump JSON into swagger json file. This should work since we just created
     # the dir `output_dir`. If this fails just let the full failure go through
     #
-    with open(swagger_file, 'w') as f:
+    with open(swagger_file, "w") as f:
         # swagger_json is a dict json.dumps will be successful.
         f.write(json.dumps(swagger_json, indent=2))
 
@@ -131,8 +127,7 @@ def _write_swagger_file(name, schema_dict, output_dir):
 def _execute_swagger_codegen(swagger_file, output_dir):
     jar = os.path.join(os.path.dirname(__file__), SWAGGER_JAR)
     codegen_config = os.path.join(os.path.dirname(__file__), CODEGEN_CONFIG)
-    codegen_template = os.path.join(os.path.dirname(__file__),
-                                    CODEGEN_TEMPLATE_DIR)
+    codegen_template = os.path.join(os.path.dirname(__file__), CODEGEN_TEMPLATE_DIR)
     #
     # Create the process that runs the jar putting stdout / stderr into pipes.
     #
@@ -168,25 +163,43 @@ def _execute_swagger_codegen(swagger_file, output_dir):
     #
     try:
         process_inputs = [
-            'java', '-jar', jar, 'generate', '-DsupportPython2=true', '-i',
-            swagger_file, '-l', 'python-flask', '-c', codegen_config, '-t',
-            codegen_template, '--model-package', CODEGEN_MODULE, '-o',
-            output_dir
+            "java",
+            "-jar",
+            jar,
+            "generate",
+            "-DsupportPython2=true",
+            "-i",
+            swagger_file,
+            "-l",
+            "python-flask",
+            "-c",
+            codegen_config,
+            "-t",
+            codegen_template,
+            "--model-package",
+            CODEGEN_MODULE,
+            "-o",
+            output_dir,
         ]
 
-        logger.info('Running process with arguments: {!r}'.format(
-            ' '.join(process_inputs)))
-        process = subprocess.Popen(process_inputs,
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
+        logger.info(
+            "Running process with arguments: {!r}".format(" ".join(process_inputs))
+        )
+        process = subprocess.Popen(
+            process_inputs, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
     except OSError as err:
         if err.errno == errno.ENOENT:
-            raise exceptions.UserError('Swagger python code generation failed.'
-                                       ' Make sure java is on the PATH.')
+            raise exceptions.UserError(
+                "Swagger python code generation failed."
+                " Make sure java is on the PATH."
+            )
         raise exceptions.UserError(
-            'Unable to run {!r} to generate python code.'
-            '\nError code: {}. Error message: {}'.format(
-                jar, err.errno, os.strerror(err.errno)))
+            "Unable to run {!r} to generate python code."
+            "\nError code: {}. Error message: {}".format(
+                jar, err.errno, os.strerror(err.errno)
+            )
+        )
 
     # Get the pipes pointed so we have access to them.
     stdout, stderr = process.communicate()
@@ -196,14 +209,15 @@ def _execute_swagger_codegen(swagger_file, output_dir):
     # something failed so throw a UserError.
     #
     if process.wait():
-        logger.error('stdout: {}'.format(stdout))
-        logger.error('stderr: {}'.format(stderr))
-        raise exceptions.UserError('Swagger python code generation failed.'
-                                   'See logs for more information.')
+        logger.error("stdout: {}".format(stdout))
+        logger.error("stderr: {}".format(stderr))
+        raise exceptions.UserError(
+            "Swagger python code generation failed." "See logs for more information."
+        )
 
     # Print the stdout and err into the logs.
-    logger.info('stdout: {}'.format(stdout))
-    logger.info('stderr: {}'.format(stderr))
+    logger.info("stdout: {}".format(stdout))
+    logger.info("stderr: {}".format(stderr))
 
 
 def _copy_generated_to_dir(src_location, dst_location):
@@ -222,8 +236,11 @@ def _copy_generated_to_dir(src_location, dst_location):
     destination_dir = os.path.join(dst_location, CODEGEN_PACKAGE)
     file_util.make_dir(destination_dir, True)
 
-    logger.info('Copying generated files {} from {!r} to {!r}.'.format(
-        CODEGEN_COPY_FILES, source_dir, destination_dir))
+    logger.info(
+        "Copying generated files {} from {} to {}.".format(
+            CODEGEN_COPY_FILES, source_dir, destination_dir
+        )
+    )
 
     for name in CODEGEN_COPY_FILES:
         src = os.path.join(source_dir, name)
@@ -233,7 +250,7 @@ def _copy_generated_to_dir(src_location, dst_location):
             # must include the name of of the dir for it to be copied there.
             #
             shutil.copytree(src, os.path.join(destination_dir, name))
-            logger.info('Successfully copied directory {!r}.'.format(name))
+            logger.info("Successfully copied directory {}.".format(name))
         except OSError as err:
             if err.errno == errno.ENOTDIR or err.errno == errno.EINVAL:
                 #
@@ -245,7 +262,7 @@ def _copy_generated_to_dir(src_location, dst_location):
                 # errno.EINVAL is received on windows
                 #
                 shutil.copy2(src, destination_dir)
-                logger.info('Successfully copied file {!r}.'.format(name))
+                logger.info("Successfully copied file {}.".format(name))
             else:
                 #
                 # Since we're not expecting any other errors raise anything

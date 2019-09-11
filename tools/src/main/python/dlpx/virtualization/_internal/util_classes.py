@@ -5,14 +5,14 @@
 import enum
 import os
 
-STAGED_TYPE = 'STAGED'
-DIRECT_TYPE = 'DIRECT'
+UNIX_HOST_TYPE = "UNIX"
+WINDOWS_HOST_TYPE = "WINDOWS"
+STAGED_TYPE = "STAGED"
+DIRECT_TYPE = "DIRECT"
 
-OUTPUT_DIR_NAME = '.dvp-gen-output'
-PLUGIN_SCHEMAS_DIR = os.path.join(os.path.dirname(__file__),
-                                  'validation_schemas')
-PLUGIN_CONFIG_SCHEMA = os.path.join(PLUGIN_SCHEMAS_DIR,
-                                    'plugin_config_schema.json')
+OUTPUT_DIR_NAME = ".dvp-gen-output"
+PLUGIN_SCHEMAS_DIR = os.path.join(os.path.dirname(__file__), "validation_schemas")
+PLUGIN_CONFIG_SCHEMA = os.path.join(PLUGIN_SCHEMAS_DIR, "plugin_config_schema.json")
 
 #
 # This is a temporary file. Once blackbox has made the transition to 'id'
@@ -20,9 +20,10 @@ PLUGIN_CONFIG_SCHEMA = os.path.join(PLUGIN_SCHEMAS_DIR,
 # associated with it can be removed.
 #
 PLUGIN_CONFIG_SCHEMA_NO_ID_VALIDATION = os.path.join(
-    PLUGIN_SCHEMAS_DIR, 'plugin_config_schema_no_id_validation.json')
+    PLUGIN_SCHEMAS_DIR, "plugin_config_schema_no_id_validation.json"
+)
 
-PLUGIN_SCHEMA = os.path.join(PLUGIN_SCHEMAS_DIR, 'plugin_schema.json')
+PLUGIN_SCHEMA = os.path.join(PLUGIN_SCHEMAS_DIR, "plugin_schema.json")
 
 
 class ValidationMode(enum.Enum):
@@ -32,6 +33,7 @@ class ValidationMode(enum.Enum):
     WARNING - validator will log a warning if validation fails.
     ERROR - validator will raise an exception if validation fails.
     """
+
     INFO = 1
     WARNING = 2
     ERROR = 3
@@ -41,18 +43,20 @@ class MessageUtils:
     """
     Defines helpers methods to format warning and exception messages.
     """
+
     @staticmethod
     def exception_msg(exceptions):
-        exception_msg = '\n'.join(
-            MessageUtils.__format_msg('Error', ex)
-            for ex in exceptions['exception'])
+        exception_msg = "\n".join(
+            MessageUtils.__format_msg("Error", ex) for ex in exceptions["exception"]
+        )
         return exception_msg
 
     @staticmethod
     def warning_msg(warnings):
-        warning_msg = '\n'.join(
-            MessageUtils.__format_msg('Warning', warning)
-            for warning in warnings['warning'])
+        warning_msg = "\n".join(
+            MessageUtils.__format_msg("Warning", warning)
+            for warning in warnings["warning"]
+        )
         return warning_msg
 
     @staticmethod

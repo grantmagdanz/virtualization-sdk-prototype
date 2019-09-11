@@ -9,8 +9,7 @@ import os
 
 import pytest
 import yaml
-from dlpx.virtualization._internal import (cli, click_util, package_util,
-                                           util_classes)
+from dlpx.virtualization._internal import cli, click_util, package_util, util_classes
 
 #
 # conftest.py is used to share fixtures among multiple tests files. pytest will
@@ -33,8 +32,9 @@ def plugin_config_file(tmpdir, plugin_config_filename, plugin_config_content):
      write that directly.
     """
     if isinstance(plugin_config_content, dict):
-        plugin_config_content = yaml.dump(plugin_config_content,
-                                          default_flow_style=False)
+        plugin_config_content = yaml.dump(
+            plugin_config_content, default_flow_style=False
+        )
 
     f = tmpdir.join(plugin_config_filename)
     f.write(plugin_config_content)
@@ -43,19 +43,21 @@ def plugin_config_file(tmpdir, plugin_config_filename, plugin_config_content):
 
 @pytest.fixture
 def plugin_config_filename():
-    return 'plugin_config.yml'
+    return "plugin_config.yml"
 
 
 @pytest.fixture
 def fake_staged_plugin_config():
-    return os.path.join(os.path.dirname(__file__),
-                        'fake_plugin/staged/plugin_config.yml')
+    return os.path.join(
+        os.path.dirname(__file__), "fake_plugin/staged/plugin_config.yml"
+    )
 
 
 @pytest.fixture
 def fake_direct_plugin_config():
-    return os.path.join(os.path.dirname(__file__),
-                        'fake_plugin/direct/plugin_config.yml')
+    return os.path.join(
+        os.path.dirname(__file__), "fake_plugin/direct/plugin_config.yml"
+    )
 
 
 @pytest.fixture
@@ -71,7 +73,7 @@ def src_dir(tmpdir, src_dirname):
 
 @pytest.fixture
 def src_dirname():
-    return 'src'
+    return "src"
 
 
 @pytest.fixture
@@ -92,7 +94,7 @@ def schema_file(tmpdir, schema_filename, schema_content):
 
 @pytest.fixture
 def schema_filename():
-    return 'schema.json'
+    return "schema.json"
 
 
 @pytest.fixture
@@ -101,8 +103,8 @@ def dvp_config_file(tmpdir, dvp_config_properties):
     os.mkdir(dvp_dir)
     dvp_config_filepath = os.path.join(dvp_dir, click_util.CONFIG_FILE_NAME)
     parser = configparser.ConfigParser()
-    parser['default'] = dvp_config_properties
-    with open(dvp_config_filepath, 'wb') as config_file:
+    parser["default"] = dvp_config_properties
+    with open(dvp_config_filepath, "wb") as config_file:
         parser.write(config_file)
 
     #
@@ -116,24 +118,19 @@ def dvp_config_file(tmpdir, dvp_config_properties):
     # Context settings are initialized before the pytest fixture object
     # is created, so read the config file before the command is invoked
     #
-    cli.CONTEXT_SETTINGS['obj'] = {}
-    cli.CONTEXT_SETTINGS['obj'] = click_util.ConfigFileProcessor.read_config()
+    cli.CONTEXT_SETTINGS["obj"] = {}
+    cli.CONTEXT_SETTINGS["obj"] = click_util.ConfigFileProcessor.read_config()
 
     reload(cli)
 
 
 @pytest.fixture
 def dvp_config_properties():
-    return {
-        'engine': 'engine.delphix.com',
-        'user': 'user',
-        'password': 'password'
-    }
+    return {"engine": "engine.delphix.com", "user": "user", "password": "password"}
 
 
 @pytest.fixture
-def artifact_file(tmpdir, artifact_content, artifact_filename,
-                  artifact_file_created):
+def artifact_file(tmpdir, artifact_content, artifact_filename, artifact_file_created):
     """
     This fixture creates a tempdir and writes the artifact_filename file
     with the artifact_content passed in via the fixture. Then it returns the
@@ -151,7 +148,7 @@ def artifact_file(tmpdir, artifact_content, artifact_filename,
 
 @pytest.fixture
 def artifact_filename():
-    return 'artifact.json'
+    return "artifact.json"
 
 
 @pytest.fixture
@@ -160,48 +157,55 @@ def artifact_file_created():
 
 
 @pytest.fixture
-def plugin_config_content(plugin_id, plugin_name, src_dir, schema_file,
-                          language, manual_discovery, plugin_type):
+def plugin_config_content(
+    plugin_id,
+    plugin_name,
+    src_dir,
+    schema_file,
+    language,
+    manual_discovery,
+    plugin_type,
+):
     """
     This fixutre creates the dict expected in the properties yaml file the
     customer must provide for the build and compile commands.
     """
     config = {
-        'version': '2.0.0',
-        'hostTypes': ['UNIX'],
-        'entryPoint': 'python_vfiles:vfiles',
-        'defaultLocale': 'en-us',
-        'rootSquashEnabled': True,
+        "version": "2.0.0",
+        "hostTypes": ["UNIX"],
+        "entryPoint": "python_vfiles:vfiles",
+        "defaultLocale": "en-us",
+        "rootSquashEnabled": True,
     }
     if id:
-        config['id'] = plugin_id
+        config["id"] = plugin_id
 
     if plugin_name:
-        config['name'] = plugin_name
+        config["name"] = plugin_name
 
     if plugin_type:
-        config['pluginType'] = plugin_type
+        config["pluginType"] = plugin_type
 
     if src_dir:
-        config['srcDir'] = src_dir
+        config["srcDir"] = src_dir
 
     if schema_file:
-        config['schemaFile'] = schema_file
+        config["schemaFile"] = schema_file
 
     if language:
-        config['language'] = language
+        config["language"] = language
 
     # Here we do is not None check because we will be passing in
     # booleans as a parameter in tests.
     if manual_discovery is not None:
-        config['manualDiscovery'] = manual_discovery
+        config["manualDiscovery"] = manual_discovery
 
     return config
 
 
 @pytest.fixture
 def plugin_entry_point_name():
-    return 'vfiles'
+    return "vfiles"
 
 
 @pytest.fixture
@@ -248,43 +252,43 @@ def plugin_module_content(plugin_entry_point_name):
 @pytest.fixture
 def plugin_manifest():
     manifest = {
-        'type': 'PluginManifest',
-        'hasRepositoryDiscovery': True,
-        'hasSourceConfigDiscovery': True,
-        'hasLinkedPreSnapshot': True,
-        'hasLinkedPostSnapshot': True,
-        'hasLinkedStartStaging': True,
-        'hasLinkedStopStaging': False,
-        'hasLinkedStatus': True,
-        'hasLinkedWorker': False,
-        'hasLinkedMountSpecification': True,
-        'hasVirtualConfigure': True,
-        'hasVirtualUnconfigure': False,
-        'hasVirtualReconfigure': True,
-        'hasVirtualStart': True,
-        'hasVirtualStop': False,
-        'hasVirtualPreSnapshot': True,
-        'hasVirtualPostSnapshot': True,
-        'hasVirtualMountSpecification': True,
-        'hasVirtualStatus': False,
-        'hasInitialize': False
+        "type": "PluginManifest",
+        "hasRepositoryDiscovery": True,
+        "hasSourceConfigDiscovery": True,
+        "hasLinkedPreSnapshot": True,
+        "hasLinkedPostSnapshot": True,
+        "hasLinkedStartStaging": True,
+        "hasLinkedStopStaging": False,
+        "hasLinkedStatus": True,
+        "hasLinkedWorker": False,
+        "hasLinkedMountSpecification": True,
+        "hasVirtualConfigure": True,
+        "hasVirtualUnconfigure": False,
+        "hasVirtualReconfigure": True,
+        "hasVirtualStart": True,
+        "hasVirtualStop": False,
+        "hasVirtualPreSnapshot": True,
+        "hasVirtualPostSnapshot": True,
+        "hasVirtualMountSpecification": True,
+        "hasVirtualStatus": False,
+        "hasInitialize": False,
     }
     return manifest
 
 
 @pytest.fixture
 def plugin_id():
-    return '16bef554-9470-11e9-b2e3-8c8590d4a42c'
+    return "16bef554-9470-11e9-b2e3-8c8590d4a42c"
 
 
 @pytest.fixture
 def plugin_name():
-    return 'python_vfiles'
+    return "python_vfiles"
 
 
 @pytest.fixture
 def language():
-    return 'PYTHON27'
+    return "PYTHON27"
 
 
 @pytest.fixture
@@ -303,29 +307,34 @@ def plugin_type():
 
 
 @pytest.fixture
-def schema_content(repository_definition, source_config_definition,
-                   virtual_source_definition, linked_source_definition,
-                   snapshot_definition, additional_definition):
+def schema_content(
+    repository_definition,
+    source_config_definition,
+    virtual_source_definition,
+    linked_source_definition,
+    snapshot_definition,
+    additional_definition,
+):
 
     schema = {}
 
     if repository_definition:
-        schema['repositoryDefinition'] = repository_definition
+        schema["repositoryDefinition"] = repository_definition
 
     if source_config_definition:
-        schema['sourceConfigDefinition'] = source_config_definition
+        schema["sourceConfigDefinition"] = source_config_definition
 
     if virtual_source_definition:
-        schema['virtualSourceDefinition'] = virtual_source_definition
+        schema["virtualSourceDefinition"] = virtual_source_definition
 
     if linked_source_definition:
-        schema['linkedSourceDefinition'] = linked_source_definition
+        schema["linkedSourceDefinition"] = linked_source_definition
 
     if snapshot_definition:
-        schema['snapshotDefinition'] = snapshot_definition
+        schema["snapshotDefinition"] = snapshot_definition
 
     if additional_definition:
-        schema['additionalDefinition'] = additional_definition
+        schema["additionalDefinition"] = additional_definition
 
     return schema
 
@@ -335,7 +344,7 @@ def swagger_schema_content(schema_content, snapshot_parameters_definition):
 
     schema = schema_content
     if snapshot_parameters_definition:
-        schema['snapshotParametersDefinition'] = snapshot_parameters_definition
+        schema["snapshotParametersDefinition"] = snapshot_parameters_definition
 
     return schema
 
@@ -343,77 +352,54 @@ def swagger_schema_content(schema_content, snapshot_parameters_definition):
 @pytest.fixture
 def repository_definition():
     return {
-        'type': 'object',
-        'properties': {
-            'name': {
-                'type': 'string'
-            }
-        },
-        'nameField': 'name',
-        'identityFields': ['name']
+        "type": "object",
+        "properties": {"name": {"type": "string"}},
+        "nameField": "name",
+        "identityFields": ["name"],
     }
 
 
 @pytest.fixture
 def source_config_definition():
     return {
-        'type': 'object',
-        'required': ['name', 'path'],
-        'additionalProperties': False,
-        'properties': {
-            'name': {
-                'type': 'string'
-            },
-            'path': {
-                'type': 'string'
-            }
-        },
-        'nameField': 'name',
-        'identityFields': ['path']
+        "type": "object",
+        "required": ["name", "path"],
+        "additionalProperties": False,
+        "properties": {"name": {"type": "string"}, "path": {"type": "string"}},
+        "nameField": "name",
+        "identityFields": ["path"],
     }
 
 
 @pytest.fixture
 def virtual_source_definition():
     return {
-        'type': 'object',
-        'additionalProperties': False,
-        'properties': {
-            'path': {
-                'type': 'string'
-            }
-        }
+        "type": "object",
+        "additionalProperties": False,
+        "properties": {"path": {"type": "string"}},
     }
 
 
 @pytest.fixture
 def linked_source_definition():
-    return {'type': 'object', 'additionalProperties': False, 'properties': {}}
+    return {"type": "object", "additionalProperties": False, "properties": {}}
 
 
 @pytest.fixture
 def snapshot_definition():
     return {
-        'type': 'object',
-        'additionalProperties': False,
-        'properties': {
-            'snapshot_name': {
-                'type': 'string'
-            }
-        }
+        "type": "object",
+        "additionalProperties": False,
+        "properties": {"snapshot_name": {"type": "string"}},
     }
 
 
 @pytest.fixture
 def snapshot_parameters_definition():
     return {
-        'type': 'object',
-        'additionalProperties': False,
-        'properties': {
-            'resync': {
-                'type': 'boolean'
-            }
-        }
+        "type": "object",
+        "additionalProperties": False,
+        "properties": {"resync": {"type": "boolean"}},
     }
 
 
@@ -423,49 +409,57 @@ def additional_definition():
 
 
 @pytest.fixture
-def basic_artifact_content(engine_api, virtual_source_definition,
-                           linked_source_definition, discovery_definition,
-                           snapshot_definition):
+def basic_artifact_content(
+    engine_api,
+    virtual_source_definition,
+    linked_source_definition,
+    discovery_definition,
+    snapshot_definition,
+):
     artifact = {
-        'type': 'Plugin',
-        'name': '16bef554-9470-11e9-b2e3-8c8590d4a42c',
-        'prettyName': 'python_vfiles',
-        'version': '2.0.0',
-        'defaultLocale': 'en-us',
-        'language': 'PYTHON27',
-        'hostTypes': ['UNIX'],
-        'entryPoint': 'python_vfiles:vfiles',
-        'buildApi': package_util.get_build_api_version(),
-        'engineApi': engine_api,
-        'rootSquashEnabled': True,
-        'sourceCode': 'UEsFBgAAAAAAAAAAAAAAAAAAAAAAAA==',
-        'manifest': {}
+        "type": "Plugin",
+        "name": "16bef554-9470-11e9-b2e3-8c8590d4a42c",
+        "prettyName": "python_vfiles",
+        "version": "2.0.0",
+        "defaultLocale": "en-us",
+        "language": "PYTHON27",
+        "hostTypes": ["UNIX"],
+        "entryPoint": "python_vfiles:vfiles",
+        "buildApi": package_util.get_build_api_version(),
+        "engineApi": engine_api,
+        "rootSquashEnabled": True,
+        "sourceCode": "UEsFBgAAAAAAAAAAAAAAAAAAAAAAAA==",
+        "manifest": {},
     }
     if virtual_source_definition:
-        artifact['virtualSourceDefinition'] = {
-            'type': 'PluginVirtualSourceDefinition',
-            'parameters': virtual_source_definition
+        artifact["virtualSourceDefinition"] = {
+            "type": "PluginVirtualSourceDefinition",
+            "parameters": virtual_source_definition,
         }
 
     if linked_source_definition:
-        artifact['linkedSourceDefinition'] = {
-            'type': 'PluginLinkedDirectSourceDefinition',
-            'parameters': linked_source_definition
+        artifact["linkedSourceDefinition"] = {
+            "type": "PluginLinkedDirectSourceDefinition",
+            "parameters": linked_source_definition,
         }
 
     if discovery_definition:
-        artifact['discoveryDefinition'] = discovery_definition
+        artifact["discoveryDefinition"] = discovery_definition
 
     if snapshot_definition:
-        artifact['snapshotSchema'] = snapshot_definition
+        artifact["snapshotSchema"] = snapshot_definition
 
     return artifact
 
 
 @pytest.fixture
-def artifact_content(engine_api, virtual_source_definition,
-                     linked_source_definition, discovery_definition,
-                     snapshot_definition):
+def artifact_content(
+    engine_api,
+    virtual_source_definition,
+    linked_source_definition,
+    discovery_definition,
+    snapshot_definition,
+):
     """
     This fixture creates base artifact that was generated from build and
     used in upload. If any fields besides engine_api needs to be changed,
@@ -473,94 +467,95 @@ def artifact_content(engine_api, virtual_source_definition,
     this function.
     """
     artifact = {
-        'type': 'Plugin',
-        'name': '16bef554-9470-11e9-b2e3-8c8590d4a42c',
-        'prettyName': 'python_vfiles',
-        'version': '2.0.0',
-        'defaultLocale': 'en-us',
-        'language': 'PYTHON27',
-        'hostTypes': ['UNIX'],
-        'entryPoint': 'python_vfiles:vfiles',
-        'buildApi': package_util.get_build_api_version(),
-        'sourceCode': 'UEsFBgAAAAAAAAAAAAAAAAAAAAAAAA==',
-        'rootSquashEnabled': True,
-        'manifest': {}
+        "type": "Plugin",
+        "name": "16bef554-9470-11e9-b2e3-8c8590d4a42c",
+        "prettyName": "python_vfiles",
+        "version": "2.0.0",
+        "defaultLocale": "en-us",
+        "language": "PYTHON27",
+        "hostTypes": ["UNIX"],
+        "entryPoint": "python_vfiles:vfiles",
+        "buildApi": package_util.get_build_api_version(),
+        "sourceCode": "UEsFBgAAAAAAAAAAAAAAAAAAAAAAAA==",
+        "rootSquashEnabled": True,
+        "manifest": {},
     }
 
     if engine_api:
-        artifact['engineApi'] = engine_api
+        artifact["engineApi"] = engine_api
 
     if virtual_source_definition:
-        artifact['virtualSourceDefinition'] = {
-            'type': 'PluginVirtualSourceDefinition',
-            'parameters': virtual_source_definition,
+        artifact["virtualSourceDefinition"] = {
+            "type": "PluginVirtualSourceDefinition",
+            "parameters": virtual_source_definition,
         }
 
     if linked_source_definition:
-        artifact['linkedSourceDefinition'] = {
-            'type': 'PluginLinkedDirectSourceDefinition',
-            'parameters': linked_source_definition,
+        artifact["linkedSourceDefinition"] = {
+            "type": "PluginLinkedDirectSourceDefinition",
+            "parameters": linked_source_definition,
         }
 
     if discovery_definition:
-        artifact['discoveryDefinition'] = discovery_definition
+        artifact["discoveryDefinition"] = discovery_definition
 
     if snapshot_definition:
-        artifact['snapshotSchema'] = snapshot_definition
+        artifact["snapshotSchema"] = snapshot_definition
 
     return artifact
 
 
 @pytest.fixture
 def engine_api():
-    return {'type': 'APIVersion', 'major': 1, 'minor': 10, 'micro': 5}
+    return {"type": "APIVersion", "major": 1, "minor": 10, "micro": 5}
 
 
 @pytest.fixture
-def discovery_definition(repository_definition, source_config_definition,
-                         artifact_manual_discovery):
-    discovery_definition = {'type': 'PluginDiscoveryDefinition'}
+def discovery_definition(
+    repository_definition, source_config_definition, artifact_manual_discovery
+):
+    discovery_definition = {"type": "PluginDiscoveryDefinition"}
 
     if artifact_manual_discovery:
-        discovery_definition[
-            'manualSourceConfigDiscovery'] = artifact_manual_discovery
+        discovery_definition["manualSourceConfigDiscovery"] = artifact_manual_discovery
 
     if repository_definition:
         old_repository_def = copy.deepcopy(repository_definition)
-        repo_id_fields = old_repository_def.pop('identityFields', None)
-        repo_name_field = old_repository_def.pop('nameField', None)
+        repo_id_fields = old_repository_def.pop("identityFields", None)
+        repo_name_field = old_repository_def.pop("nameField", None)
 
         if repo_id_fields:
-            discovery_definition['repositoryIdentityFields'] = repo_id_fields
+            discovery_definition["repositoryIdentityFields"] = repo_id_fields
         if repo_name_field:
-            discovery_definition['repositoryNameField'] = repo_name_field
-        discovery_definition['repositorySchema'] = old_repository_def
+            discovery_definition["repositoryNameField"] = repo_name_field
+        discovery_definition["repositorySchema"] = old_repository_def
 
     if source_config_definition:
         old_source_config_def = copy.deepcopy(source_config_definition)
-        scf_id_fields = old_source_config_def.pop('identityFields', None)
-        scf_name_field = old_source_config_def.pop('nameField', None)
+        scf_id_fields = old_source_config_def.pop("identityFields", None)
+        scf_name_field = old_source_config_def.pop("nameField", None)
 
         if scf_id_fields:
-            discovery_definition['sourceConfigIdentityFields'] = scf_id_fields
+            discovery_definition["sourceConfigIdentityFields"] = scf_id_fields
         if scf_name_field:
-            discovery_definition['sourceConfigNameField'] = scf_name_field
-        discovery_definition['sourceConfigSchema'] = old_source_config_def
+            discovery_definition["sourceConfigNameField"] = scf_name_field
+        discovery_definition["sourceConfigSchema"] = old_source_config_def
 
     return discovery_definition
 
 
 @pytest.fixture
 def linked_source_def_type(plugin_type):
-    if plugin_type == 'DIRECT':
-        return 'PluginLinkedDirectSourceDefinition'
+    if plugin_type == "DIRECT":
+        return "PluginLinkedDirectSourceDefinition"
     else:
-        return 'PluginLinkedStagedSourceDefinition'
+        return "PluginLinkedStagedSourceDefinition"
 
 
 @pytest.fixture
-def codegen_gen_py_inputs(plugin_config_file, plugin_name, src_dir, tmpdir,
-                          schema_content):
+def codegen_gen_py_inputs(
+    plugin_config_file, plugin_name, src_dir, tmpdir, schema_content
+):
     class CodegenInput:
         def __init__(self, name, source_dir, plugin_content_dir, schema_dict):
             self.name = name

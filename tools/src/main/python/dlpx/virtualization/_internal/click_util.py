@@ -5,11 +5,10 @@
 import os
 
 import click
-from click_configfile import (ConfigFileReader, Param, SectionSchema,
-                              matches_section)
+from click_configfile import ConfigFileReader, Param, SectionSchema, matches_section
 
-CONFIG_DIR_NAME = '.dvp'
-CONFIG_FILE_NAME = 'config'
+CONFIG_DIR_NAME = ".dvp"
+CONFIG_FILE_NAME = "config"
 
 
 class ConfigSectionSchema(object):
@@ -18,6 +17,7 @@ class ConfigSectionSchema(object):
     limited to command line options that relate to the delphix engine such as:
     engine, user, and password.
     """
+
     @matches_section("default")
     class DvpProperties(SectionSchema):
         engine = Param(type=str)
@@ -30,9 +30,9 @@ class ConfigFileProcessor(ConfigFileReader):
     The config file processor will search for a config file in the current
     user's home directory.
     """
+
     config_files = [
-        os.path.expanduser(os.path.join('~', CONFIG_DIR_NAME,
-                                        CONFIG_FILE_NAME))
+        os.path.expanduser(os.path.join("~", CONFIG_DIR_NAME, CONFIG_FILE_NAME))
     ]
     config_section_schemas = [ConfigSectionSchema.DvpProperties]
 
@@ -57,12 +57,17 @@ def validate_option_exists(ctx, param, value):
         # Let the user know if there is an environment variable for this param
         if param.envvar:
             raise click.BadParameter(
-                ('Option is required and must be specified via '
-                 'the command line or using the environment variable "{}".'.
-                 format(param.envvar)))
+                (
+                    "Option is required and must be specified via "
+                    'the command line or using the environment variable "{}".'.format(
+                        param.envvar
+                    )
+                )
+            )
         else:
-            raise click.BadParameter(('Option is required and must be '
-                                      'specified via the command line.'))
+            raise click.BadParameter(
+                ("Option is required and must be " "specified via the command line.")
+            )
     return value
 
 
@@ -97,18 +102,20 @@ class MutuallyExclusiveOption(click.Option):
     to build the plugin before it is uploaded as a convenience. These two
     should not be specified together.
     """
+
     def __init__(self, *args, **kwargs):
-        self.mutually_exclusive = set(kwargs.pop('mutually_exclusive', []))
+        self.mutually_exclusive = set(kwargs.pop("mutually_exclusive", []))
         super(MutuallyExclusiveOption, self).__init__(*args, **kwargs)
 
     def handle_parse_result(self, ctx, opts, args):
         if self.mutually_exclusive.intersection(opts) and self.name in opts:
             raise click.UsageError(
                 '"{}" is mutually exclusive with argument(s) "{}".'.format(
-                    self.name, ', '.join(self.mutually_exclusive)))
+                    self.name, ", ".join(self.mutually_exclusive)
+                )
+            )
 
-        return super(MutuallyExclusiveOption,
-                     self).handle_parse_result(ctx, opts, args)
+        return super(MutuallyExclusiveOption, self).handle_parse_result(ctx, opts, args)
 
 
 class PasswordPromptIf(click.Option):
@@ -117,13 +124,13 @@ class PasswordPromptIf(click.Option):
     configuration file. This is done by building a custom class derived from
     click.Option and overriding click.Option.handle_parse_result().
     """
+
     def __init__(self, *args, **kwargs):
         super(PasswordPromptIf, self).__init__(*args, **kwargs)
 
     def handle_parse_result(self, ctx, opts, args):
         # remove prompt if password exists in configuration file
-        if 'password' in ctx.obj.keys():
+        if "password" in ctx.obj.keys():
             self.prompt = None
 
-        return super(PasswordPromptIf,
-                     self).handle_parse_result(ctx, opts, args)
+        return super(PasswordPromptIf, self).handle_parse_result(ctx, opts, args)

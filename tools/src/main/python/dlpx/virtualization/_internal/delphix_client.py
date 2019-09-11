@@ -18,8 +18,9 @@ class DelphixClient(object):
     credentials as well as the used Delphix Engine API version. Methods can
     potentially raise HttpPostError and UnexpectedError.
     """
-    __BOUNDARY = '----------boundary------'
-    __UPLOAD_CONTENT = 'multipart/form-data; boundary={}'.format(__BOUNDARY)
+
+    __BOUNDARY = "----------boundary------"
+    __UPLOAD_CONTENT = "multipart/form-data; boundary={}".format(__BOUNDARY)
     __cookie = None
 
     def __init__(self, engine):
@@ -30,21 +31,16 @@ class DelphixClient(object):
         Takes in the engine_api, user, and password and attempts to login to
         the engine. Can raise HttpPostError and UnexpectedError.
         """
-        logger.info('Logging onto the Delphix Engine {!r}.'.format(
-            self.__engine))
-        self.__post('delphix/session',
-                    data={
-                        'type': 'APISession',
-                        'version': engine_api
-                    })
-        logger.debug('Session started successfully.')
-        self.__post('delphix/login',
-                    data={
-                        'type': 'LoginRequest',
-                        'username': user,
-                        'password': password
-                    })
-        logger.info('Successfully logged in as {!r}.'.format(user))
+        logger.info("Logging onto the Delphix Engine {!r}.".format(self.__engine))
+        self.__post(
+            "delphix/session", data={"type": "APISession", "version": engine_api}
+        )
+        logger.debug("Session started successfully.")
+        self.__post(
+            "delphix/login",
+            data={"type": "LoginRequest", "username": user, "password": password},
+        )
+        logger.info("Successfully logged in as {!r}.".format(user))
 
     @staticmethod
     def get_engine_api(artifact_content):
@@ -53,21 +49,21 @@ class DelphixClient(object):
         validate before returning. If the api is missing or malformed
         raise an InvalidArtifactError
         """
-        if 'engineApi' in artifact_content:
-            engine_api = artifact_content['engineApi']
-            if (isinstance(engine_api, dict)
-                    and engine_api.get('type') == 'APIVersion'
-                    and isinstance(engine_api.get('major'), int)
-                    and isinstance(engine_api.get('minor'), int)
-                    and isinstance(engine_api.get('micro'), int)):
-                logger.info('engineApi found: {}.'.format(
-                    json.dumps(engine_api)))
+        if "engineApi" in artifact_content:
+            engine_api = artifact_content["engineApi"]
+            if (
+                isinstance(engine_api, dict)
+                and engine_api.get("type") == "APIVersion"
+                and isinstance(engine_api.get("major"), int)
+                and isinstance(engine_api.get("minor"), int)
+                and isinstance(engine_api.get("micro"), int)
+            ):
+                logger.info("engineApi found: {}.".format(json.dumps(engine_api)))
                 return engine_api
-            logger.debug(
-                'engineApi found but malformed: {!r}'.format(engine_api))
+            logger.debug("engineApi found but malformed: {!r}".format(engine_api))
         raise exceptions.InvalidArtifactError()
 
-    def __post(self, resource, content_type='application/json', data=None):
+    def __post(self, resource, content_type="application/json", data=None):
         """
         Generates the http request post based on the resource. If no
         content_type is passed in assume it's a json. If the post fails we
@@ -75,14 +71,14 @@ class DelphixClient(object):
         UnexpectedError.
         """
         # Form HTTP header and add the cookie if one has been set.
-        headers = {'Content-type': content_type}
+        headers = {"Content-type": content_type}
         if self.__cookie is not None:
-            logger.debug('Cookie being used: {}'.format(self.__cookie))
-            headers['Cookie'] = self.__cookie
+            logger.debug("Cookie being used: {}".format(self.__cookie))
+            headers["Cookie"] = self.__cookie
         else:
-            logger.debug('No cookie being used')
+            logger.debug("No cookie being used")
 
-        url = 'http://{}/resources/json/{}'.format(self.__engine, resource)
+        url = "http://{}/resources/json/{}".format(self.__engine, resource)
         #
         # Issue post request that was passed in, if data is a dict then convert
         # it to a json string.
@@ -92,38 +88,39 @@ class DelphixClient(object):
         try:
             response = requests.post(url=url, data=data, headers=headers)
         except requests.exceptions.RequestException as err:
-            raise exceptions.UserError('Encountered a http request failure.'
-                                       '\n{}'.format(err))
+            raise exceptions.UserError(
+                "Encountered a http request failure." "\n{}".format(err)
+            )
 
         #
         # Save cookie if one was received because the next time a request
         # happens the newest cookie is expected. If the post recent cookie
         # returned isn't used the request will fail.
         #
-        if 'set-cookie' in response.headers:
-            self.__cookie = response.headers['set-cookie']
-            logger.debug('New cookie found: {}'.format(self.__cookie))
+        if "set-cookie" in response.headers:
+            self.__cookie = response.headers["set-cookie"]
+            logger.debug("New cookie found: {}".format(self.__cookie))
 
         try:
             response_json = response.json()
         except ValueError:
-            raise exceptions.UnexpectedError(response.status_code,
-                                             response.text)
+            raise exceptions.UnexpectedError(response.status_code, response.text)
 
-        logger.debug('Response body: {}'.format(json.dumps(response_json)))
+        logger.debug("Response body: {}".format(json.dumps(response_json)))
 
-        if (response.status_code == 200
-                and (response_json.get('type') == 'OKResult'
-                     or response_json.get('type') == 'DataResult')):
+        if response.status_code == 200 and (
+            response_json.get("type") == "OKResult"
+            or response_json.get("type") == "DataResult"
+        ):
             return response_json
 
-        if response_json.get('type') == 'ErrorResult':
-            raise exceptions.HttpError(response.status_code,
-                                       response_json['error'])
-        raise exceptions.UnexpectedError(response.status_code,
-                                         json.dumps(response_json, indent=2))
+        if response_json.get("type") == "ErrorResult":
+            raise exceptions.HttpError(response.status_code, response_json["error"])
+        raise exceptions.UnexpectedError(
+            response.status_code, json.dumps(response_json, indent=2)
+        )
 
-    def __get(self, resource, content_type='application/json', stream=False):
+    def __get(self, resource, content_type="application/json", stream=False):
         """
         Generates the http request get based on the resource provided. If no
         content_type is passed in assume it's application/json. If the get
@@ -131,59 +128,61 @@ class DelphixClient(object):
         UnexpectedError.
         """
         # Form HTTP header and add the cookie if one has been set.
-        headers = {'Content-type': content_type}
+        headers = {"Content-type": content_type}
         if self.__cookie is not None:
-            logger.debug('Cookie being used: {}'.format(self.__cookie))
-            headers['Cookie'] = self.__cookie
+            logger.debug("Cookie being used: {}".format(self.__cookie))
+            headers["Cookie"] = self.__cookie
         else:
-            logger.debug('No cookie being used')
+            logger.debug("No cookie being used")
 
-        url = 'http://{}/resources/json/{}'.format(self.__engine, resource)
+        url = "http://{}/resources/json/{}".format(self.__engine, resource)
 
         try:
             response = requests.get(url=url, headers=headers, stream=stream)
         except requests.exceptions.RequestException as err:
-            raise exceptions.UserError('Encountered a http request failure.'
-                                       '\n{}'.format(err))
+            raise exceptions.UserError(
+                "Encountered a http request failure." "\n{}".format(err)
+            )
 
         #
         # Save cookie if one was received because the next time a request
         # happens the newest cookie is expected. If the post recent cookie
         # returned isn't used the request will fail.
         #
-        if 'set-cookie' in response.headers:
-            self.__cookie = response.headers['set-cookie']
-            logger.debug('New cookie found: {}'.format(self.__cookie))
+        if "set-cookie" in response.headers:
+            self.__cookie = response.headers["set-cookie"]
+            logger.debug("New cookie found: {}".format(self.__cookie))
 
         if response.status_code == 200:
             return response
         else:
             response_error = None
             try:
-                response_error = response.json()['error']
+                response_error = response.json()["error"]
             except ValueError:
                 pass
             raise exceptions.HttpError(response.status_code, response_error)
 
     def __get_plugin_ref_from_id(self, plugin_name, plugin_id):
 
-        logger.info('Getting plugin object ref for {}'.format(plugin_name))
+        logger.info("Getting plugin object ref for {}".format(plugin_name))
 
-        plugin_response = self.__get('delphix/toolkit')
+        plugin_response = self.__get("delphix/toolkit")
         try:
             plugins = plugin_response.json()
         except ValueError:
-            raise exceptions.UnexpectedError(plugin_response.status_code,
-                                             plugin_response.text)
+            raise exceptions.UnexpectedError(
+                plugin_response.status_code, plugin_response.text
+            )
 
-        for p in plugins['result']:
+        for p in plugins["result"]:
             #
             # Compare the plugin id to the name field from each plugin
             # and make sure the plugin hasn't been replicated.
             # The 'name' field will be converted to 'id' in the future.
             #
-            if p['name'] == plugin_id and p['namespace'] is None:
-                return p['reference']
+            if p["name"] == plugin_id and p["namespace"] is None:
+                return p["reference"]
 
         raise exceptions.MissingPluginError(plugin_name, self.__engine)
 
@@ -194,15 +193,19 @@ class DelphixClient(object):
         """
 
         logger.info(
-            'Downloading logs for plugin {} with token {} to {}.'.format(
-                plugin_name, token, directory))
+            "Downloading logs for plugin {} with token {} to {}.".format(
+                plugin_name, token, directory
+            )
+        )
 
         download_zip_data = self.__get(
-            'delphix/data/downloadOutputStream?token={}'.format(token),
-            'application/octet-stream', True)
+            "delphix/data/downloadOutputStream?token={}".format(token),
+            "application/octet-stream",
+            True,
+        )
         download_zip_name = "{}/{}".format(
-            directory,
-            "dlpx-plugin-logs-{}-{}.tar.gz".format(plugin_name, token))
+            directory, "dlpx-plugin-logs-{}-{}.tar.gz".format(plugin_name, token)
+        )
         with open(download_zip_name, "wb") as f:
             for chunk in download_zip_data:
                 f.write(chunk)
@@ -215,17 +218,19 @@ class DelphixClient(object):
         """
 
         # Get the upload token.
-        logger.debug('Getting token to do upload.')
-        response = self.__post('delphix/toolkit/requestUploadToken')
-        token = response['result']['token']
-        logger.debug('Got token {!r} successfully.'.format(token))
+        logger.debug("Getting token to do upload.")
+        response = self.__post("delphix/toolkit/requestUploadToken")
+        token = response["result"]["token"]
+        logger.debug("Got token {!r} successfully.".format(token))
 
-        logger.info('Uploading plugin {!r}.'.format(name))
+        logger.info("Uploading plugin {!r}.".format(name))
         # Encode plugin content.
-        self.__post('delphix/data/upload',
-                    content_type=self.__UPLOAD_CONTENT,
-                    data=self.__encode(json.dumps(content), token, name))
-        logger.info('Plugin was successfully uploaded.')
+        self.__post(
+            "delphix/data/upload",
+            content_type=self.__UPLOAD_CONTENT,
+            data=self.__encode(json.dumps(content), token, name),
+        )
+        logger.info("Plugin was successfully uploaded.")
 
     def download_plugin_logs(self, directory, plugin_config):
         """
@@ -234,30 +239,26 @@ class DelphixClient(object):
         """
 
         # Get the name and id of the plugin from the plugin config.
-        plugin_name = plugin_util.get_plugin_config_property(
-            plugin_config, 'name')
-        plugin_id = plugin_util.get_plugin_config_property(plugin_config, 'id')
+        plugin_name = plugin_util.get_plugin_config_property(plugin_config, "name")
+        plugin_id = plugin_util.get_plugin_config_property(plugin_config, "id")
 
         # Convert plugin id to object reference id.
         plugin_ref = self.__get_plugin_ref_from_id(plugin_name, plugin_id)
 
         # Get the download token.
-        logger.info(
-            'Getting token for download for plugin: {}.'.format(plugin_ref))
+        logger.info("Getting token for download for plugin: {}.".format(plugin_ref))
         data = {
-            'type': 'SupportBundleGenerateParameters',
-            'bundleType': 'PLUGIN_LOG',
-            'plugin': '{}'.format(plugin_ref)
+            "type": "SupportBundleGenerateParameters",
+            "bundleType": "PLUGIN_LOG",
+            "plugin": "{}".format(plugin_ref),
         }
-        response = self.__post('delphix/service/support/bundle/generate',
-                               data=data)
-        token = response['result'].encode('utf-8').strip()
-        logger.debug('Got token {!r} successfully.'.format(token))
+        response = self.__post("delphix/service/support/bundle/generate", data=data)
+        token = response["result"].encode("utf-8").strip()
+        logger.debug("Got token {!r} successfully.".format(token))
 
         self.__download_logs(plugin_name, token, directory)
 
-        logger.info('Plugin logs were successfully downloaded to {}.'.format(
-            directory))
+        logger.info("Plugin logs were successfully downloaded to {}.".format(directory))
 
     @staticmethod
     def __encode(content, token, filename):
@@ -270,26 +271,30 @@ class DelphixClient(object):
         encode_body = []
 
         # Add the metadata about the upload first
-        encode_body.extend([
-            '--{}'.format(DelphixClient.__BOUNDARY),
-            'Content-Disposition: form-data; name="{}"'.format('token'),
-            '',
-            token,
-        ])
+        encode_body.extend(
+            [
+                "--{}".format(DelphixClient.__BOUNDARY),
+                'Content-Disposition: form-data; name="{}"'.format("token"),
+                "",
+                token,
+            ]
+        )
 
         #
         # Put file contents in body. The upload server determines the
         # mime-type so no need to set it.
         #
-        encode_body.extend([
-            '--{}'.format(DelphixClient.__BOUNDARY),
-            'Content-Disposition:'
-            'form-data; name="file"; filename="{}"'.format(filename),
-            'Content-Type: application/octet-stream',
-            '',
-            content,
-        ])
-        encode_body.extend(['--{}--'.format(DelphixClient.__BOUNDARY), ''])
-        logger.debug('Generated body: {}'.format(encode_body))
+        encode_body.extend(
+            [
+                "--{}".format(DelphixClient.__BOUNDARY),
+                "Content-Disposition:"
+                'form-data; name="file"; filename="{}"'.format(filename),
+                "Content-Type: application/octet-stream",
+                "",
+                content,
+            ]
+        )
+        encode_body.extend(["--{}--".format(DelphixClient.__BOUNDARY), ""])
+        logger.debug("Generated body: {}".format(encode_body))
         # Return context_type to use and body
-        return '\r\n'.join(encode_body)
+        return "\r\n".join(encode_body)
