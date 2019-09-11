@@ -1,6 +1,6 @@
 name: Pre-commit
 
-on: [issues, pull_request]
+on: [pull_request]
 
 jobs:
   test-tools:
@@ -32,37 +32,6 @@ jobs:
       run: |
         pip install pytest
         PYTHONPATH=src/main/python pytest src/test/python/
-        
-
-  test-package:
-    name: Test the dvp-${{ matrix.package }} package
-
-    runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 4
-      matrix:
-        package: [common, libs, platform]
-
-    steps:
-    - uses: actions/checkout@v1
-    
-    - name: Set up Python 2.7
-      uses: actions/setup-python@v1
-      with:
-        python-version: 2.7
-        
-    - name: Install dependencies
-      working-directory: ${{ matrix.package }}
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r lock.requirements.txt -r lock.dev-requirements.txt
-        
-    - name: Test with pytest
-      working-directory: ${{ matrix.package }}
-      run: |
-        pip install pytest
-        PYTHONPATH=src/main/python pytest src/test/python/
-        
         
   lint:
     name: Lint ${{ matrix.package }}
@@ -104,6 +73,8 @@ jobs:
         package: [tools]
       
     steps:
+      - uses: actions/checkout@v1
+      
       - name: Check src format
         uses: lgeiger/black-action@v1.0.1
         with:
