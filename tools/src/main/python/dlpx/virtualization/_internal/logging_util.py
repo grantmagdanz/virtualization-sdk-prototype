@@ -7,8 +7,8 @@ import os
 import sys
 import time
 
-LOGGING_DIRECTORY = os.path.expanduser(os.path.join('~', '.dvp', 'logs'))
-DEBUG_FILE_NAME = 'debug.log'
+LOGGING_DIRECTORY = os.path.expanduser(os.path.join("~", ".dvp", "logs"))
+DEBUG_FILE_NAME = "debug.log"
 
 
 def add_console_handler(console_logging_level):
@@ -18,15 +18,17 @@ def add_console_handler(console_logging_level):
 
     This handler will always print to stdout.
     """
-    formatter = logging.Formatter('%(message)s')
+    formatter = logging.Formatter("%(message)s")
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(formatter)
     console_handler.setLevel(console_logging_level)
 
     logger = logging.getLogger(__package__)
     logger.addHandler(console_handler)
-    logger.debug('Console logging configured with logging level %d',
-                 console_logging_level)
+    logger.debug(
+        "Console logging configured with logging level %d",
+        console_logging_level,
+    )
 
 
 def setup_logger():
@@ -53,10 +55,12 @@ def setup_logger():
     if not log_directory_exists:
         logger.debug(
             "Creating and using log directory '%s' as it does not exist.",
-            LOGGING_DIRECTORY)
+            LOGGING_DIRECTORY,
+        )
     else:
-        logger.debug("Log directory '%s' exists and will be used.",
-                     LOGGING_DIRECTORY)
+        logger.debug(
+            "Log directory '%s' exists and will be used.", LOGGING_DIRECTORY
+        )
 
 
 def _configure_logger(log_directory):
@@ -75,25 +79,25 @@ def _configure_logger(log_directory):
     debug_log = os.path.join(log_directory, DEBUG_FILE_NAME)
 
     logging_config = {
-        'version': 1,
+        "version": 1,
         #
         # Module level loggers in modules that have been imported prior to
         # setting up this logger should not be disabled when we add the
         # configuration.
         #
-        'disable_existing_loggers': False,
-        'formatters': {
-            'detailed': {
-                '()':
-                UTCFormatter,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "detailed": {
+                "()": UTCFormatter,
                 # Example: 2019-01-08 20:38:14,736 DEBUG    [cli.py:64] debug
-                'format': ('%(asctime)s,%(msecs)d %(levelname)-8s'
-                           ' [%(filename)s:%(lineno)d] %(message)s'),
-                'datefmt':
-                '%Y-%m-%d %H:%M:%S',
-            },
+                "format": (
+                    "%(asctime)s,%(msecs)d %(levelname)-8s"
+                    " [%(filename)s:%(lineno)d] %(message)s"
+                ),
+                "datefmt": "%Y-%m-%d %H:%M:%S",
+            }
         },
-        'handlers': {
+        "handlers": {
             #
             # Use a RotatingFileHandler. Once the debug file reaches maxBytes
             # it will be renamed from debug.log to debug.log.1 and debug.log
@@ -101,33 +105,28 @@ def _configure_logger(log_directory):
             # files have been created, when the handler needs to create a new
             # file, the oldest file will be deleted.
             #
-            'file': {
-                'class': 'logging.handlers.RotatingFileHandler',
-                'formatter': 'detailed',
-                'level': logging.DEBUG,
-                'filename': debug_log,
-                'maxBytes': 2**20,  # 2MB in bytes
-                'backupCount': 5,
+            "file": {
+                "class": "logging.handlers.RotatingFileHandler",
+                "formatter": "detailed",
+                "level": logging.DEBUG,
+                "filename": debug_log,
+                "maxBytes": 2 ** 20,  # 2MB in bytes
+                "backupCount": 5,
             }
         },
         #
         # Setup the package's logger. The level is logging.NOTSET so handlers
         # are in control of what level is logged where.
         #
-        'loggers': {
-            __package__: {
-                'handlers': ['file'],
-                'level': logging.NOTSET
-            },
+        "loggers": {
+            __package__: {"handlers": ["file"], "level": logging.NOTSET},
             #
             # The root logger's level should be NOTSET as well or else log
             # messages won't be propogated to the virtualization._internal
             # logger.
             #
-            '': {
-                'level': logging.NOTSET
-            }
-        }
+            "": {"level": logging.NOTSET},
+        },
     }
 
     logging.config.dictConfig(logging_config)

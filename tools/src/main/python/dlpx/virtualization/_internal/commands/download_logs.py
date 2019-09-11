@@ -25,14 +25,16 @@ def download_logs(engine, plugin_config, user, password, directory):
         HttpError
         UnexpectedError
     """
-    logger.debug('Download parameters include'
-                 ' engine: {},'
-                 ' plugin_config: {}'
-                 ' user: {},'
-                 ' directory: {}'.format(engine, plugin_config, user,
-                                         directory))
-    logger.info('Downloading plugin logs from {} to: {}'.format(
-        engine, directory))
+    logger.debug(
+        "Download parameters include"
+        " engine: {},"
+        " plugin_config: {}"
+        " user: {},"
+        " directory: {}".format(engine, plugin_config, user, directory)
+    )
+    logger.info(
+        "Downloading plugin logs from {} to: {}".format(engine, directory)
+    )
 
     # Create a new delphix session.
     client = delphix_client.DelphixClient(engine)

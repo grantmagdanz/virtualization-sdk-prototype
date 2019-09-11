@@ -11,7 +11,7 @@ from six.moves import configparser
 
 logger = logging.getLogger(__name__)
 
-SETTINGS_FILE_NAME = 'settings.cfg'
+SETTINGS_FILE_NAME = "settings.cfg"
 
 
 def _run_once(fn):
@@ -44,17 +44,17 @@ def _get_settings():
 @_run_once
 def get_version():
     """Returns the version of the dlpx.virtualization._internal package."""
-    return _get_settings().get('General', 'package_version')
+    return _get_settings().get("General", "package_version")
 
 
 def get_build_api_version():
     """Returns the sdk build version in the format build command expects"""
-    major, minor, micro = (int(n) for n in get_version().split('.'))
+    major, minor, micro = (int(n) for n in get_version().split("."))
     build_api_version = {
-        'type': 'APIVersion',
-        'major': major,
-        'minor': minor,
-        'micro': micro
+        "type": "APIVersion",
+        "major": major,
+        "minor": minor,
+        "micro": micro,
     }
     return build_api_version
 
@@ -64,18 +64,19 @@ def get_engine_api_version_from_settings():
     """
     Returns the engine api version from dlpx.virtualization._internal package.
     """
-    return _get_settings().get('General', 'engine_api_version')
+    return _get_settings().get("General", "engine_api_version")
 
 
 def get_engine_api_version():
     """Returns the engine api version in JSON format."""
     major, minor, micro = (
-        int(n) for n in get_engine_api_version_from_settings().split('.'))
+        int(n) for n in get_engine_api_version_from_settings().split(".")
+    )
     engine_api_version = {
-        'type': 'APIVersion',
-        'major': major,
-        'minor': minor,
-        'micro': micro
+        "type": "APIVersion",
+        "major": major,
+        "minor": minor,
+        "micro": micro,
     }
     return engine_api_version
 
@@ -90,4 +91,4 @@ def get_internal_package_root():
         if os.path.isfile(settings_path):
             return path
     else:
-        raise RuntimeError('Could not find settings file')
+        raise RuntimeError("Could not find settings file")

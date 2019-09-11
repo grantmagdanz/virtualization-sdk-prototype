@@ -27,15 +27,16 @@ def delete_paths(*args):
             try:
                 if os.path.isdir(path):
                     logger.debug(
-                        'A directory exists at %r. Attempting to delete.',
-                        path)
+                        "A directory exists at %r. Attempting to delete.", path
+                    )
                     shutil.rmtree(path)
                 else:
-                    logger.debug('A file exists at %r. Attempting to delete.',
-                                 path)
+                    logger.debug(
+                        "A file exists at %r. Attempting to delete.", path
+                    )
                     os.remove(path)
             except Exception as e:
-                logger.debug('Failed to delete %r: %s.', path, e.message)
+                logger.debug("Failed to delete %r: %s.", path, e.message)
                 logger.debug(traceback.format_exc())
 
 
@@ -48,11 +49,11 @@ def validate_paths_do_not_exist(*args):
     Raises:
         PathExistsError: If any of the provided paths already exist.
     """
-    logger.info('Validating files and directories to be written do not exist.')
+    logger.info("Validating files and directories to be written do not exist.")
     for path in args:
         if path and os.path.exists(path):
             raise exceptions.PathExistsError(path)
-        logger.debug('SUCCESS: Path %r does not exist.', path)
+        logger.debug("SUCCESS: Path %r does not exist.", path)
 
 
 def get_src_dir_path(file_name, src_dir):
@@ -65,7 +66,7 @@ def get_src_dir_path(file_name, src_dir):
     if not os.path.exists(src_dir):
         raise exceptions.PathDoesNotExistError(src_dir)
     if not os.path.isdir(src_dir):
-        raise exceptions.PathTypeError(src_dir, 'directory')
+        raise exceptions.PathTypeError(src_dir, "directory")
     return src_dir
 
 
@@ -80,9 +81,11 @@ def make_dir(path, force_remove):
         shutil.rmtree(path, ignore_errors=True)
     try:
         os.mkdir(path)
-        logger.debug('Successfully created directory \'{}\''.format(path))
+        logger.debug("Successfully created directory '{}'".format(path))
     except OSError as err:
         raise exceptions.UserError(
-            'Unable to create new directory \'{}\''
-            '\nError code: {}. Error message: {}'.format(
-                path, err.errno, os.strerror(err.errno)))
+            "Unable to create new directory '{}'"
+            "\nError code: {}. Error message: {}".format(
+                path, err.errno, os.strerror(err.errno)
+            )
+        )

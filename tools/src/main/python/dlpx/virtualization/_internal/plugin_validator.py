@@ -8,16 +8,20 @@ import os
 from collections import defaultdict, namedtuple
 
 import yaml
-from dlpx.virtualization._internal import (exceptions, file_util,
-                                           plugin_importer)
+from dlpx.virtualization._internal import (
+    exceptions,
+    file_util,
+    plugin_importer,
+)
 from dlpx.virtualization._internal.util_classes import ValidationMode
 from jsonschema import Draft7Validator
 
 logger = logging.getLogger(__name__)
 
 validation_result = namedtuple(
-    'validation_result',
-    ['plugin_config_content', 'plugin_manifest', 'warnings'])
+    "validation_result",
+    ["plugin_config_content", "plugin_manifest", "warnings"],
+)
 
 
 class PluginValidator:
@@ -32,12 +36,15 @@ class PluginValidator:
         back if validation mode is error, otherwise warnings or info based
         on validation mode.
     """
-    def __init__(self,
-                 plugin_config,
-                 plugin_config_schema,
-                 validation_mode,
-                 run_all_validations,
-                 plugin_config_content=None):
+
+    def __init__(
+        self,
+        plugin_config,
+        plugin_config_schema,
+        validation_mode,
+        run_all_validations,
+        plugin_config_content=None,
+    ):
         self.__plugin_config = plugin_config
         self.__plugin_config_schema = plugin_config_schema
         self.__validation_mode = validation_mode
@@ -51,11 +58,17 @@ class PluginValidator:
         return validation_result(
             plugin_config_content=self.__plugin_config_content,
             plugin_manifest=self.__plugin_manifest,
-            warnings=self.__warnings)
+            warnings=self.__warnings,
+        )
 
     @classmethod
-    def from_config_content(cls, plugin_config_file, plugin_config_content,
-                            plugin_config_schema, validation_mode):
+    def from_config_content(
+        cls,
+        plugin_config_file,
+        plugin_config_content,
+        plugin_config_schema,
+        validation_mode,
+    ):
         """
         Instantiates the validator with given plugin config content.
         plugin_config_file path is not read but used to get the absolute
@@ -63,22 +76,28 @@ class PluginValidator:
         Returns:
             PluginValidator
         """
-        return cls(plugin_config_file, plugin_config_schema, validation_mode,
-                   True, plugin_config_content)
+        return cls(
+            plugin_config_file,
+            plugin_config_schema,
+            validation_mode,
+            True,
+            plugin_config_content,
+        )
 
     def validate(self):
         """
         Validates the plugin config file.
         """
-        logger.debug('Run config validations')
+        logger.debug("Run config validations")
         try:
             self.__run_validations()
         except Exception as e:
             if self.__validation_mode is ValidationMode.INFO:
-                logger.info('Validation failed on plugin config file : %s', e)
+                logger.info("Validation failed on plugin config file : %s", e)
             elif self.__validation_mode is ValidationMode.WARNING:
-                logger.warning('Validation failed on plugin config file : %s',
-                               e)
+                logger.warning(
+                    "Validation failed on plugin config file : %s", e
+                )
             else:
                 raise e
 
@@ -88,24 +107,29 @@ class PluginValidator:
         pre-defined schema. If validation is successful, tries to import
         the plugin module and validates the entry point specified.
         """
-        logger.info('Reading plugin config file %s', self.__plugin_config)
+        logger.info("Reading plugin config file %s", self.__plugin_config)
 
         if self.__plugin_config_content is None:
             self.__plugin_config_content = self.__read_plugin_config_file()
 
-        logger.debug('Validating plugin config file content : %s',
-                     self.__plugin_config_content)
+        logger.debug(
+            "Validating plugin config file content : %s",
+            self.__plugin_config_content,
+        )
         self.__validate_plugin_config_content()
 
         if not self.__run_all_validations:
-            logger.debug('Plugin config file schema validation is done')
+            logger.debug("Plugin config file schema validation is done")
             return
 
         src_dir = file_util.get_src_dir_path(
-            self.__plugin_config, self.__plugin_config_content['srcDir'])
+            self.__plugin_config, self.__plugin_config_content["srcDir"]
+        )
 
-        logger.debug('Validating plugin entry point : %s',
-                     self.__plugin_config_content['entryPoint'])
+        logger.debug(
+            "Validating plugin entry point : %s",
+            self.__plugin_config_content["entryPoint"],
+        )
         self.__validate_plugin_entry_point(src_dir)
 
     def __read_plugin_config_file(self):
@@ -114,24 +138,29 @@ class PluginValidator:
         reading the file.
         """
         try:
-            with open(self.__plugin_config, 'rb') as f:
+            with open(self.__plugin_config, "rb") as f:
                 try:
                     return yaml.safe_load(f)
                 except yaml.YAMLError as err:
-                    if hasattr(err, 'problem_mark'):
+                    if hasattr(err, "problem_mark"):
                         mark = err.problem_mark
                         raise exceptions.UserError(
-                            'Command failed because the plugin config file '
-                            'provided as input \'{}\' was not valid yaml. '
-                            'Verify the file contents. '
-                            'Error position: {}:{}'.format(
-                                self.__plugin_config, mark.line + 1,
-                                mark.column + 1))
+                            "Command failed because the plugin config file "
+                            "provided as input '{}' was not valid yaml. "
+                            "Verify the file contents. "
+                            "Error position: {}:{}".format(
+                                self.__plugin_config,
+                                mark.line + 1,
+                                mark.column + 1,
+                            )
+                        )
         except (IOError, OSError) as err:
             raise exceptions.UserError(
-                'Unable to read plugin config file \'{}\''
-                '\nError code: {}. Error message: {}'.format(
-                    self.__plugin_config, err.errno, os.strerror(err.errno)))
+                "Unable to read plugin config file '{}'"
+                "\nError code: {}. Error message: {}".format(
+                    self.__plugin_config, err.errno, os.strerror(err.errno)
+                )
+            )
 
     def __validate_plugin_config_content(self):
         """
@@ -159,25 +188,31 @@ class PluginValidator:
         # First validate that all the expected keys are in the plugin config.
         plugin_schema = {}
         try:
-            with open(self.__plugin_config_schema, 'r') as f:
+            with open(self.__plugin_config_schema, "r") as f:
                 try:
                     plugin_schema = json.load(f)
                 except ValueError as err:
                     raise exceptions.UserError(
-                        'Failed to load schemas because {} is not a '
-                        'valid json file. Error: {}'.format(
-                            self.__plugin_config_schema, err))
+                        "Failed to load schemas because {} is not a "
+                        "valid json file. Error: {}".format(
+                            self.__plugin_config_schema, err
+                        )
+                    )
 
         except (IOError, OSError) as err:
             raise exceptions.UserError(
-                'Unable to read plugin config schema file {}'
-                '\nError code: {}. Error message: {}'.format(
-                    self.__plugin_config_schema, err.errno,
-                    os.strerror(err.errno)))
+                "Unable to read plugin config schema file {}"
+                "\nError code: {}. Error message: {}".format(
+                    self.__plugin_config_schema,
+                    err.errno,
+                    os.strerror(err.errno),
+                )
+            )
 
         # Convert plugin config content to json
         plugin_config_json = json.loads(
-            json.dumps(self.__plugin_config_content))
+            json.dumps(self.__plugin_config_content)
+        )
 
         # Validate the plugin config against the schema
         v = Draft7Validator(plugin_schema)
@@ -189,8 +224,9 @@ class PluginValidator:
         validation_errors = sorted(v.iter_errors(plugin_config_json), key=str)
 
         if validation_errors:
-            raise exceptions.SchemaValidationError(self.__plugin_config,
-                                                   validation_errors)
+            raise exceptions.SchemaValidationError(
+                self.__plugin_config, validation_errors
+            )
 
     def __validate_plugin_entry_point(self, src_dir):
         """
@@ -199,31 +235,33 @@ class PluginValidator:
         to check for errors or issues. Also does an eval on the
         entry point.
         """
-        entry_point_field = self.__plugin_config_content['entryPoint']
-        entry_point_strings = entry_point_field.split(':')
+        entry_point_field = self.__plugin_config_content["entryPoint"]
+        entry_point_strings = entry_point_field.split(":")
 
         # Get the module and entry point name to import
         entry_point_module = entry_point_strings[0]
         entry_point_object = entry_point_strings[1]
-        plugin_type = self.__plugin_config_content['pluginType']
+        plugin_type = self.__plugin_config_content["pluginType"]
 
         try:
-            self.__plugin_manifest, self.__warnings = (
-                PluginValidator.__import_plugin(src_dir, entry_point_module,
-                                                entry_point_object,
-                                                plugin_type))
+            self.__plugin_manifest, self.__warnings = PluginValidator.__import_plugin(
+                src_dir, entry_point_module, entry_point_object, plugin_type
+            )
         except ImportError as err:
             raise exceptions.UserError(
-                'Unable to load module \'{}\' specified in '
-                'pluginEntryPoint \'{}\' from path \'{}\'. '
-                'Error message: {}'.format(entry_point_module,
-                                           entry_point_object, src_dir, err))
+                "Unable to load module '{}' specified in "
+                "pluginEntryPoint '{}' from path '{}'. "
+                "Error message: {}".format(
+                    entry_point_module, entry_point_object, src_dir, err
+                )
+            )
 
         logger.debug("Got manifest %s", self.__plugin_manifest)
 
     @staticmethod
-    def __import_plugin(src_dir, entry_point_module, entry_point_object,
-                        plugin_type):
+    def __import_plugin(
+        src_dir, entry_point_module, entry_point_object, plugin_type
+    ):
         """
         Imports the given python module.
         NOTE:
@@ -234,9 +272,9 @@ class PluginValidator:
             callers of validator. To avoid such issues, perform the import in
             in a sub-process and on completion return the output.
         """
-        importer = plugin_importer.PluginImporter(src_dir, entry_point_module,
-                                                  entry_point_object,
-                                                  plugin_type, True)
+        importer = plugin_importer.PluginImporter(
+            src_dir, entry_point_module, entry_point_object, plugin_type, True
+        )
         manifest, warnings = importer.import_plugin()
 
         return manifest, warnings
