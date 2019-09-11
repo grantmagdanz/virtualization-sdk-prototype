@@ -36,9 +36,7 @@ DIRECT_OPERATIONS_TEMPLATE_NAME = "direct_operations.py.template"
 STAGED_OPERATIONS_TEMPLATE_NAME = "staged_operations.py.template"
 INIT_FILE_ROOT = os.path.dirname(__file__)
 PLUGIN_TEMPLATE_DIR = os.path.join(INIT_FILE_ROOT, "plugin_template")
-SCHEMA_TEMPLATE_PATH = os.path.join(
-    PLUGIN_TEMPLATE_DIR, "schema_template.json"
-)
+SCHEMA_TEMPLATE_PATH = os.path.join(PLUGIN_TEMPLATE_DIR, "schema_template.json")
 
 
 def init(root, ingestion_strategy, name, host_type):
@@ -72,9 +70,7 @@ def init(root, ingestion_strategy, name, host_type):
     src_dir_path = os.path.join(root, DEFAULT_SRC_DIRECTORY)
     config_file_path = os.path.join(root, DEFAULT_PLUGIN_CONFIG_FILE)
     schema_file_path = os.path.join(root, DEFAULT_SCHEMA_FILE)
-    entry_point_file_path = os.path.join(
-        src_dir_path, DEFAULT_ENTRY_POINT_FILE
-    )
+    entry_point_file_path = os.path.join(src_dir_path, DEFAULT_ENTRY_POINT_FILE)
 
     # Make sure nothing is overwritten
     file_util.validate_paths_do_not_exist(
@@ -118,16 +114,11 @@ def init(root, ingestion_strategy, name, host_type):
         shutil.copyfile(SCHEMA_TEMPLATE_PATH, schema_file_path)
 
         # Read and valida the schema file
-        result = plugin_util.read_and_validate_schema_file(
-            schema_file_path, False
-        )
+        result = plugin_util.read_and_validate_schema_file(schema_file_path, False)
 
         # Generate the definitions based on the schema file
         codegen.generate_python(
-            name,
-            src_dir_path,
-            os.path.dirname(config_file_path),
-            result.plugin_schemas,
+            name, src_dir_path, os.path.dirname(config_file_path), result.plugin_schemas
         )
 
         #
@@ -163,9 +154,7 @@ def init(root, ingestion_strategy, name, host_type):
 
     except Exception as e:
         logger.debug("Attempting to cleanup after failure. %s", e)
-        file_util.delete_paths(
-            config_file_path, schema_file_path, src_dir_path
-        )
+        file_util.delete_paths(config_file_path, schema_file_path, src_dir_path)
         raise exceptions.UserError(
             "Failed to initialize plugin directory {}: {}.".format(root, e)
         )
@@ -197,18 +186,14 @@ def _get_entry_point_contents(plugin_name, ingestion_strategy, host_type):
         default_mount_path = "/tmp/dlpx_staged_mounts/{}"
 
     if ingestion_strategy == util_classes.DIRECT_TYPE:
-        linked_operations = env.get_template(
-            DIRECT_OPERATIONS_TEMPLATE_NAME
-        ).render()
+        linked_operations = env.get_template(DIRECT_OPERATIONS_TEMPLATE_NAME).render()
     elif ingestion_strategy == util_classes.STAGED_TYPE:
-        linked_operations = env.get_template(
-            STAGED_OPERATIONS_TEMPLATE_NAME
-        ).render(default_mount_path=default_mount_path)
+        linked_operations = env.get_template(STAGED_OPERATIONS_TEMPLATE_NAME).render(
+            default_mount_path=default_mount_path
+        )
     else:
         raise RuntimeError(
-            "Got unrecognized ingestion strategy: {}".format(
-                ingestion_strategy
-            )
+            "Got unrecognized ingestion strategy: {}".format(ingestion_strategy)
         )
 
     # Call 'repr' to put the string in quotes and escape quotes.

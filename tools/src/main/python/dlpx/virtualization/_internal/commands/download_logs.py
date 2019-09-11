@@ -32,9 +32,7 @@ def download_logs(engine, plugin_config, user, password, directory):
         " user: {},"
         " directory: {}".format(engine, plugin_config, user, directory)
     )
-    logger.info(
-        "Downloading plugin logs from {} to: {}".format(engine, directory)
-    )
+    logger.info("Downloading plugin logs from {} to: {}".format(engine, directory))
 
     # Create a new delphix session.
     client = delphix_client.DelphixClient(engine)

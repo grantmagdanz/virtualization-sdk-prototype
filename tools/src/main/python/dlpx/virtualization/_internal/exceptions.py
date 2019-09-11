@@ -40,9 +40,7 @@ class PathTypeError(UserError):
     def __init__(self, path, path_type):
         self.path = path
         self.path_type = path_type
-        message = "The path {} should be a {} but is not.".format(
-            path, path_type
-        )
+        message = "The path {} should be a {} but is not.".format(path, path_type)
         super(PathTypeError, self).__init__(message)
 
 
@@ -151,9 +149,7 @@ class UnexpectedError(UserError):
         self.response = response
         message = (
             "Received an unexpected error with HTTP Status {},"
-            "\nDumping full response:\n{}".format(
-                str(self.status_code), self.response
-            )
+            "\nDumping full response:\n{}".format(str(self.status_code), self.response)
         )
         super(UnexpectedError, self).__init__(message)
 
@@ -192,9 +188,7 @@ class SchemaValidationError(UserError):
             # get the error string based on those errors.
             #
             if err.context:
-                nested_errors = SchemaValidationError.__format_errors(
-                    err.context
-                )
+                nested_errors = SchemaValidationError.__format_errors(err.context)
                 all_errors.extend(nested_errors)
 
         return all_errors

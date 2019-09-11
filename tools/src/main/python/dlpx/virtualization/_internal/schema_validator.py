@@ -13,9 +13,7 @@ from jsonschema import Draft7Validator
 
 logger = logging.getLogger(__name__)
 
-validation_result = namedtuple(
-    "validation_result", ["plugin_schemas", "warnings"]
-)
+validation_result = namedtuple("validation_result", ["plugin_schemas", "warnings"])
 
 
 class SchemaValidator:
@@ -29,9 +27,7 @@ class SchemaValidator:
         on validation mode.
     """
 
-    def __init__(
-        self, schema_file, plugin_meta_schema, validation_mode, schemas=None
-    ):
+    def __init__(self, schema_file, plugin_meta_schema, validation_mode, schemas=None):
         self.__schema_file = schema_file
         self.__plugin_meta_schema = plugin_meta_schema
         self.__validation_mode = validation_mode
@@ -55,9 +51,7 @@ class SchemaValidator:
             if self.__validation_mode is ValidationMode.INFO:
                 logger.info("Validation failed on plugin schema file : %s", e)
             elif self.__validation_mode is ValidationMode.WARNING:
-                logger.warning(
-                    "Validation failed on plugin schema file : %s", e
-                )
+                logger.warning("Validation failed on plugin schema file : %s", e)
             else:
                 raise e
 
@@ -88,9 +82,7 @@ class SchemaValidator:
                 except ValueError as err:
                     raise exceptions.UserError(
                         "Failed to load schemas because '{}' is not a "
-                        "valid json file. Error: {}".format(
-                            self.__schema_file, err
-                        )
+                        "valid json file. Error: {}".format(self.__schema_file, err)
                     )
         except (IOError, OSError) as err:
             raise exceptions.UserError(
@@ -123,9 +115,7 @@ class SchemaValidator:
             raise exceptions.UserError(
                 "Unable to read plugin schema file '{}'"
                 "\nError code: {}. Error message: {}".format(
-                    self.__plugin_meta_schema,
-                    err.errno,
-                    os.strerror(err.errno),
+                    self.__plugin_meta_schema, err.errno, os.strerror(err.errno)
                 )
             )
 

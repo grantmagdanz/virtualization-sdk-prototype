@@ -99,8 +99,7 @@ def generate_python(name, source_dir, plugin_config_dir, schema_content):
     # classes were generated properly.
     #
     logger.info(
-        "Copying generated python files to"
-        " source directory {}".format(source_dir)
+        "Copying generated python files to" " source directory {}".format(source_dir)
     )
     _copy_generated_to_dir(output_dir, source_dir)
 
@@ -128,9 +127,7 @@ def _write_swagger_file(name, schema_dict, output_dir):
 def _execute_swagger_codegen(swagger_file, output_dir):
     jar = os.path.join(os.path.dirname(__file__), SWAGGER_JAR)
     codegen_config = os.path.join(os.path.dirname(__file__), CODEGEN_CONFIG)
-    codegen_template = os.path.join(
-        os.path.dirname(__file__), CODEGEN_TEMPLATE_DIR
-    )
+    codegen_template = os.path.join(os.path.dirname(__file__), CODEGEN_TEMPLATE_DIR)
     #
     # Create the process that runs the jar putting stdout / stderr into pipes.
     #
@@ -186,9 +183,7 @@ def _execute_swagger_codegen(swagger_file, output_dir):
         ]
 
         logger.info(
-            "Running process with arguments: {!r}".format(
-                " ".join(process_inputs)
-            )
+            "Running process with arguments: {!r}".format(" ".join(process_inputs))
         )
         process = subprocess.Popen(
             process_inputs, stdout=subprocess.PIPE, stderr=subprocess.PIPE
@@ -217,8 +212,7 @@ def _execute_swagger_codegen(swagger_file, output_dir):
         logger.error("stdout: {}".format(stdout))
         logger.error("stderr: {}".format(stderr))
         raise exceptions.UserError(
-            "Swagger python code generation failed."
-            "See logs for more information."
+            "Swagger python code generation failed." "See logs for more information."
         )
 
     # Print the stdout and err into the logs.

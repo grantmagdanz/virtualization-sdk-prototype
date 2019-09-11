@@ -36,8 +36,7 @@ __version__ = package_util.get_version()
 
 # This is needed to add -h as an option for the help menu.
 CONTEXT_SETTINGS = dict(
-    help_option_names=["-h", "--help"],
-    obj=click_util.ConfigFileProcessor.read_config(),
+    help_option_names=["-h", "--help"], obj=click_util.ConfigFileProcessor.read_config()
 )
 
 DVP_CONFIG_MAP = CONTEXT_SETTINGS["obj"]
@@ -110,11 +109,7 @@ def delphix_sdk(verbose, quiet):
     default=os.getcwd(),
     show_default=True,
     type=click.Path(
-        exists=True,
-        file_okay=False,
-        dir_okay=True,
-        writable=True,
-        resolve_path=True,
+        exists=True, file_okay=False, dir_okay=True, writable=True, resolve_path=True
     ),
     callback=click_util.validate_option_exists,
     help="Set the plugin root directory.",
@@ -123,8 +118,7 @@ def delphix_sdk(verbose, quiet):
     "-n",
     "--plugin-name",
     "name",
-    help="Set the name of the plugin that will be displayed "
-    "to the Delphix user.",
+    help="Set the name of the plugin that will be displayed " "to the Delphix user.",
 )
 @click.option(
     "-s",
@@ -132,8 +126,7 @@ def delphix_sdk(verbose, quiet):
     default=util_classes.DIRECT_TYPE,
     show_default=True,
     type=click.Choice(
-        [util_classes.DIRECT_TYPE, util_classes.STAGED_TYPE],
-        case_sensitive=False,
+        [util_classes.DIRECT_TYPE, util_classes.STAGED_TYPE], case_sensitive=False
     ),
     help=(
         'Set the ingestion strategy of the plugin. A "direct" plugin '
@@ -146,9 +139,7 @@ def delphix_sdk(verbose, quiet):
     "--host-type",
     default=util_classes.UNIX_HOST_TYPE,
     show_default=True,
-    type=click.Choice(
-        [util_classes.UNIX_HOST_TYPE, util_classes.WINDOWS_HOST_TYPE]
-    ),
+    type=click.Choice([util_classes.UNIX_HOST_TYPE, util_classes.WINDOWS_HOST_TYPE]),
     help="Set the host platform supported by the plugin.",
 )
 def init(root, ingestion_strategy, name, host_type):
@@ -167,11 +158,7 @@ def init(root, ingestion_strategy, name, host_type):
     default="plugin_config.yml",
     show_default=True,
     type=click.Path(
-        exists=True,
-        file_okay=True,
-        dir_okay=False,
-        writable=False,
-        resolve_path=True,
+        exists=True, file_okay=True, dir_okay=False, writable=False, resolve_path=True
     ),
     callback=click_util.validate_option_exists,
     help=(
@@ -185,9 +172,7 @@ def init(root, ingestion_strategy, name, host_type):
     cls=click_util.MutuallyExclusiveOption,
     default="artifact.json",
     show_default=True,
-    type=click.Path(
-        file_okay=True, dir_okay=False, writable=True, resolve_path=True
-    ),
+    type=click.Path(file_okay=True, dir_okay=False, writable=True, resolve_path=True),
     callback=click_util.validate_option_exists,
     mutually_exclusive=["generate_only"],
     help=(
@@ -256,11 +241,7 @@ def build(plugin_config, upload_artifact, generate_only, skip_id_validation):
     default="artifact.json",
     show_default=True,
     type=click.Path(
-        exists=True,
-        file_okay=True,
-        dir_okay=False,
-        readable=True,
-        resolve_path=True,
+        exists=True, file_okay=True, dir_okay=False, readable=True, resolve_path=True
     ),
     callback=click_util.validate_option_exists,
     help="Path to the upload artifact that was generated through build.",
@@ -297,9 +278,7 @@ def upload(engine, user, upload_artifact, password):
     "--plugin-config",
     default="plugin_config.yml",
     show_default=True,
-    type=click.Path(
-        exists=True, file_okay=True, dir_okay=False, resolve_path=True
-    ),
+    type=click.Path(exists=True, file_okay=True, dir_okay=False, resolve_path=True),
     callback=click_util.validate_option_exists,
     help="Set the path to plugin config file. "
     "This file contains the plugin name to download logs for.",
@@ -318,11 +297,7 @@ def upload(engine, user, upload_artifact, password):
     default=os.getcwd(),
     show_default=True,
     type=click.Path(
-        exists=True,
-        file_okay=False,
-        dir_okay=True,
-        writable=True,
-        resolve_path=True,
+        exists=True, file_okay=False, dir_okay=True, writable=True, resolve_path=True
     ),
     callback=click_util.validate_option_exists,
     help="Specify the directory of where to download the plugin logs.",
@@ -362,7 +337,5 @@ def get_console_logging_level(verbose, quiet):
     """
     assert (
         verbose == 0 or quiet == 0
-    ), "verbose is {} and quiet is {}. Both cannot be non-zero.".format(
-        verbose, quiet
-    )
+    ), "verbose is {} and quiet is {}. Both cannot be non-zero.".format(verbose, quiet)
     return 30 - verbose * 10 + quiet * 10

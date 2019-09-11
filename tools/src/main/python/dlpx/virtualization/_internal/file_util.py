@@ -31,9 +31,7 @@ def delete_paths(*args):
                     )
                     shutil.rmtree(path)
                 else:
-                    logger.debug(
-                        "A file exists at %r. Attempting to delete.", path
-                    )
+                    logger.debug("A file exists at %r. Attempting to delete.", path)
                     os.remove(path)
             except Exception as e:
                 logger.debug("Failed to delete %r: %s.", path, e.message)

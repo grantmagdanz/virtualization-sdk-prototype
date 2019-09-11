@@ -5,12 +5,7 @@
 import os
 
 import click
-from click_configfile import (
-    ConfigFileReader,
-    Param,
-    SectionSchema,
-    matches_section,
-)
+from click_configfile import ConfigFileReader, Param, SectionSchema, matches_section
 
 CONFIG_DIR_NAME = ".dvp"
 CONFIG_FILE_NAME = "config"
@@ -37,9 +32,7 @@ class ConfigFileProcessor(ConfigFileReader):
     """
 
     config_files = [
-        os.path.expanduser(
-            os.path.join("~", CONFIG_DIR_NAME, CONFIG_FILE_NAME)
-        )
+        os.path.expanduser(os.path.join("~", CONFIG_DIR_NAME, CONFIG_FILE_NAME))
     ]
     config_section_schemas = [ConfigSectionSchema.DvpProperties]
 
@@ -73,10 +66,7 @@ def validate_option_exists(ctx, param, value):
             )
         else:
             raise click.BadParameter(
-                (
-                    "Option is required and must be "
-                    "specified via the command line."
-                )
+                ("Option is required and must be " "specified via the command line.")
             )
     return value
 
@@ -125,9 +115,7 @@ class MutuallyExclusiveOption(click.Option):
                 )
             )
 
-        return super(MutuallyExclusiveOption, self).handle_parse_result(
-            ctx, opts, args
-        )
+        return super(MutuallyExclusiveOption, self).handle_parse_result(ctx, opts, args)
 
 
 class PasswordPromptIf(click.Option):
@@ -145,6 +133,4 @@ class PasswordPromptIf(click.Option):
         if "password" in ctx.obj.keys():
             self.prompt = None
 
-        return super(PasswordPromptIf, self).handle_parse_result(
-            ctx, opts, args
-        )
+        return super(PasswordPromptIf, self).handle_parse_result(ctx, opts, args)

@@ -11,12 +11,8 @@ STAGED_TYPE = "STAGED"
 DIRECT_TYPE = "DIRECT"
 
 OUTPUT_DIR_NAME = ".dvp-gen-output"
-PLUGIN_SCHEMAS_DIR = os.path.join(
-    os.path.dirname(__file__), "validation_schemas"
-)
-PLUGIN_CONFIG_SCHEMA = os.path.join(
-    PLUGIN_SCHEMAS_DIR, "plugin_config_schema.json"
-)
+PLUGIN_SCHEMAS_DIR = os.path.join(os.path.dirname(__file__), "validation_schemas")
+PLUGIN_CONFIG_SCHEMA = os.path.join(PLUGIN_SCHEMAS_DIR, "plugin_config_schema.json")
 
 #
 # This is a temporary file. Once blackbox has made the transition to 'id'
@@ -51,8 +47,7 @@ class MessageUtils:
     @staticmethod
     def exception_msg(exceptions):
         exception_msg = "\n".join(
-            MessageUtils.__format_msg("Error", ex)
-            for ex in exceptions["exception"]
+            MessageUtils.__format_msg("Error", ex) for ex in exceptions["exception"]
         )
         return exception_msg
 

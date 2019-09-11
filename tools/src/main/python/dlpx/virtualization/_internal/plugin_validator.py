@@ -8,19 +8,14 @@ import os
 from collections import defaultdict, namedtuple
 
 import yaml
-from dlpx.virtualization._internal import (
-    exceptions,
-    file_util,
-    plugin_importer,
-)
+from dlpx.virtualization._internal import exceptions, file_util, plugin_importer
 from dlpx.virtualization._internal.util_classes import ValidationMode
 from jsonschema import Draft7Validator
 
 logger = logging.getLogger(__name__)
 
 validation_result = namedtuple(
-    "validation_result",
-    ["plugin_config_content", "plugin_manifest", "warnings"],
+    "validation_result", ["plugin_config_content", "plugin_manifest", "warnings"]
 )
 
 
@@ -95,9 +90,7 @@ class PluginValidator:
             if self.__validation_mode is ValidationMode.INFO:
                 logger.info("Validation failed on plugin config file : %s", e)
             elif self.__validation_mode is ValidationMode.WARNING:
-                logger.warning(
-                    "Validation failed on plugin config file : %s", e
-                )
+                logger.warning("Validation failed on plugin config file : %s", e)
             else:
                 raise e
 
@@ -113,8 +106,7 @@ class PluginValidator:
             self.__plugin_config_content = self.__read_plugin_config_file()
 
         logger.debug(
-            "Validating plugin config file content : %s",
-            self.__plugin_config_content,
+            "Validating plugin config file content : %s", self.__plugin_config_content
         )
         self.__validate_plugin_config_content()
 
@@ -149,9 +141,7 @@ class PluginValidator:
                             "provided as input '{}' was not valid yaml. "
                             "Verify the file contents. "
                             "Error position: {}:{}".format(
-                                self.__plugin_config,
-                                mark.line + 1,
-                                mark.column + 1,
+                                self.__plugin_config, mark.line + 1, mark.column + 1
                             )
                         )
         except (IOError, OSError) as err:
@@ -203,16 +193,12 @@ class PluginValidator:
             raise exceptions.UserError(
                 "Unable to read plugin config schema file {}"
                 "\nError code: {}. Error message: {}".format(
-                    self.__plugin_config_schema,
-                    err.errno,
-                    os.strerror(err.errno),
+                    self.__plugin_config_schema, err.errno, os.strerror(err.errno)
                 )
             )
 
         # Convert plugin config content to json
-        plugin_config_json = json.loads(
-            json.dumps(self.__plugin_config_content)
-        )
+        plugin_config_json = json.loads(json.dumps(self.__plugin_config_content))
 
         # Validate the plugin config against the schema
         v = Draft7Validator(plugin_schema)
@@ -259,9 +245,7 @@ class PluginValidator:
         logger.debug("Got manifest %s", self.__plugin_manifest)
 
     @staticmethod
-    def __import_plugin(
-        src_dir, entry_point_module, entry_point_object, plugin_type
-    ):
+    def __import_plugin(src_dir, entry_point_module, entry_point_object, plugin_type):
         """
         Imports the given python module.
         NOTE:

@@ -24,29 +24,21 @@ def read_and_validate_plugin_config_file(
         On successful validation, returns content of the plugin
         config.
     """
-    validation_mode = (
-        ValidationMode.ERROR if stop_build else ValidationMode.WARNING
-    )
+    validation_mode = ValidationMode.ERROR if stop_build else ValidationMode.WARNING
     plugin_config_schema_file = (
         util_classes.PLUGIN_CONFIG_SCHEMA_NO_ID_VALIDATION
         if skip_id_validation
         else util_classes.PLUGIN_CONFIG_SCHEMA
     )
     validator = PluginValidator(
-        plugin_config,
-        plugin_config_schema_file,
-        validation_mode,
-        run_all_validations,
+        plugin_config, plugin_config_schema_file, validation_mode, run_all_validations
     )
     validator.validate()
     return validator.result
 
 
 def get_plugin_manifest(
-    plugin_config_file,
-    plugin_config_content,
-    stop_build,
-    skip_id_validation=False,
+    plugin_config_file, plugin_config_content, stop_build, skip_id_validation=False
 ):
     """
     Validates the given plugin config content using a pre-defined schema.
@@ -54,9 +46,7 @@ def get_plugin_manifest(
     directory. Returns a manifest which indicates method implemented in the
     plugin module.
     """
-    validation_mode = (
-        ValidationMode.ERROR if stop_build else ValidationMode.WARNING
-    )
+    validation_mode = ValidationMode.ERROR if stop_build else ValidationMode.WARNING
     plugin_config_schema_file = (
         util_classes.PLUGIN_CONFIG_SCHEMA_NO_ID_VALIDATION
         if skip_id_validation
@@ -80,9 +70,7 @@ def read_and_validate_schema_file(schema_file, stop_build):
     Returns:
         On successful validation, returns the schemas.
     """
-    validation_mode = (
-        ValidationMode.ERROR if stop_build else ValidationMode.WARNING
-    )
+    validation_mode = ValidationMode.ERROR if stop_build else ValidationMode.WARNING
     validator = SchemaValidator(
         schema_file, util_classes.PLUGIN_SCHEMA, validation_mode
     )
@@ -94,9 +82,7 @@ def get_plugin_config_property(plugin_config_path, prop):
     """
     Returns the value for a specific property from the plugin config file.
     """
-    result = read_and_validate_plugin_config_file(
-        plugin_config_path, False, False
-    )
+    result = read_and_validate_plugin_config_file(plugin_config_path, False, False)
     return result.plugin_config_content[prop]
 
 

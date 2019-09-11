@@ -26,8 +26,7 @@ def add_console_handler(console_logging_level):
     logger = logging.getLogger(__package__)
     logger.addHandler(console_handler)
     logger.debug(
-        "Console logging configured with logging level %d",
-        console_logging_level,
+        "Console logging configured with logging level %d", console_logging_level
     )
 
 
@@ -58,9 +57,7 @@ def setup_logger():
             LOGGING_DIRECTORY,
         )
     else:
-        logger.debug(
-            "Log directory '%s' exists and will be used.", LOGGING_DIRECTORY
-        )
+        logger.debug("Log directory '%s' exists and will be used.", LOGGING_DIRECTORY)
 
 
 def _configure_logger(log_directory):

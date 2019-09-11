@@ -44,16 +44,10 @@ class PluginImporter:
     validation_maps = load_validation_maps()
     expected_staged_args_by_op = validation_maps["EXPECTED_STAGED_ARGS_BY_OP"]
     expected_direct_args_by_op = validation_maps["EXPECTED_DIRECT_ARGS_BY_OP"]
-    required_methods_by_plugin_type = validation_maps[
-        "REQUIRED_METHODS_BY_PLUGIN_TYPE"
-    ]
-    required_methods_description = validation_maps[
-        "REQUIRED_METHODS_DESCRIPTION"
-    ]
+    required_methods_by_plugin_type = validation_maps["REQUIRED_METHODS_BY_PLUGIN_TYPE"]
+    required_methods_description = validation_maps["REQUIRED_METHODS_DESCRIPTION"]
 
-    def __init__(
-        self, src_dir, module, entry_point, plugin_type, validate=False
-    ):
+    def __init__(self, src_dir, module, entry_point, plugin_type, validate=False):
         self.__src_dir = src_dir
         self.__plugin_module = module
         self.__plugin_entry_point = entry_point
@@ -105,10 +99,7 @@ class PluginImporter:
                 "Unable to load module '{}' specified in "
                 "pluginEntryPoint '{}' from path '{}' "
                 "Error message: {}".format(
-                    self.__plugin_module,
-                    self.__plugin_entry_point,
-                    self.__src_dir,
-                    err,
+                    self.__plugin_module, self.__plugin_entry_point, self.__src_dir, err
                 )
             )
             warnings["exception"].append(exception_msg)
@@ -138,10 +129,7 @@ class PluginImporter:
         warnings = defaultdict(list)
         if not plugin_manifest:
             return warnings
-        for (
-            method_key,
-            method_name,
-        ) in PluginImporter.required_methods_by_plugin_type[
+        for (method_key, method_name) in PluginImporter.required_methods_by_plugin_type[
             plugin_type
         ].items():
             if plugin_manifest[method_key] is False:
@@ -150,17 +138,13 @@ class PluginImporter:
                     "for required method {}. The Plugin Operation '{}' "
                     "will fail when executed.".format(
                         method_name,
-                        PluginImporter.required_methods_description[
-                            method_key
-                        ],
+                        PluginImporter.required_methods_description[method_key],
                     )
                 )
         return warnings
 
     @staticmethod
-    def __import_in_subprocess(
-        src_dir, module, entry_point, plugin_type, validate
-    ):
+    def __import_in_subprocess(src_dir, module, entry_point, plugin_type, validate):
         """
         Imports the given python module in a sub process.
         NOTE:
@@ -238,9 +222,7 @@ class PluginImporter:
             exception_msg += "\n{}".format(MessageUtils.warning_msg(warnings))
             raise exceptions.UserError(
                 "{}\n{} Warning(s). {} Error(s).".format(
-                    exception_msg,
-                    len(warnings["warning"]),
-                    len(warnings["exception"]),
+                    exception_msg, len(warnings["warning"]), len(warnings["exception"])
                 )
             )
 
@@ -250,9 +232,7 @@ def _get_manifest(queue, src_dir, module, entry_point, plugin_type, validate):
     sys.path.append(src_dir)
     try:
         module_content = importlib.import_module(module)
-        manifest = _validate_and_get_manifest(
-            module, module_content, entry_point
-        )
+        manifest = _validate_and_get_manifest(module, module_content, entry_point)
 
         if validate:
             #
@@ -261,13 +241,9 @@ def _get_manifest(queue, src_dir, module, entry_point, plugin_type, validate):
             # These warnings should be treated as an exception to make
             # sure build fails.
             #
-            warnings = _validate_named_args(
-                module_content, entry_point, plugin_type
-            )
+            warnings = _validate_named_args(module_content, entry_point, plugin_type)
             if warnings:
-                map(
-                    lambda warning: queue.put({"exception": warning}), warnings
-                )
+                map(lambda warning: queue.put({"exception": warning}), warnings)
     except ImportError as err:
         queue.put({"exception": err})
     except exceptions.UserError as user_err:
@@ -322,12 +298,8 @@ def _validate_and_get_manifest(module, module_content, entry_point):
     # Check which methods on the plugin object have been implemented.
     manifest = {
         "type": "PluginManifest",
-        "hasRepositoryDiscovery": bool(
-            plugin_object.discovery.repository_impl
-        ),
-        "hasSourceConfigDiscovery": bool(
-            plugin_object.discovery.source_config_impl
-        ),
+        "hasRepositoryDiscovery": bool(plugin_object.discovery.repository_impl),
+        "hasSourceConfigDiscovery": bool(plugin_object.discovery.source_config_impl),
         "hasLinkedPreSnapshot": bool(plugin_object.linked.pre_snapshot_impl),
         "hasLinkedPostSnapshot": bool(plugin_object.linked.post_snapshot_impl),
         "hasLinkedStartStaging": bool(plugin_object.linked.start_staging_impl),
@@ -343,9 +315,7 @@ def _validate_and_get_manifest(module, module_content, entry_point):
         "hasVirtualStart": bool(plugin_object.virtual.start_impl),
         "hasVirtualStop": bool(plugin_object.virtual.stop_impl),
         "hasVirtualPreSnapshot": bool(plugin_object.virtual.pre_snapshot_impl),
-        "hasVirtualPostSnapshot": bool(
-            plugin_object.virtual.post_snapshot_impl
-        ),
+        "hasVirtualPostSnapshot": bool(plugin_object.virtual.post_snapshot_impl),
         "hasVirtualMountSpecification": bool(
             plugin_object.virtual.mount_specification_impl
         ),
@@ -415,10 +385,6 @@ def _check_args(method_name, expected_args, actual_args):
 
 def _lookup_expected_args(plugin_type, plugin_op_type, plugin_op_name):
     if plugin_type == util_classes.DIRECT_TYPE:
-        return PluginImporter.expected_direct_args_by_op[plugin_op_type][
-            plugin_op_name
-        ]
+        return PluginImporter.expected_direct_args_by_op[plugin_op_type][plugin_op_name]
     else:
-        return PluginImporter.expected_staged_args_by_op[plugin_op_type][
-            plugin_op_name
-        ]
+        return PluginImporter.expected_staged_args_by_op[plugin_op_type][plugin_op_name]

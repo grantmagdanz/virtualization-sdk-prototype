@@ -60,9 +60,7 @@ def build(plugin_config, upload_artifact, generate_only, skip_id_validation):
         raise exceptions.BuildFailedError(err)
 
     plugin_config_content = result.plugin_config_content
-    logger.debug(
-        "plugin config file content is : %s", result.plugin_config_content
-    )
+    logger.debug("plugin config file content is : %s", result.plugin_config_content)
 
     schema_file = plugin_util.get_schema_file_path(
         plugin_config, plugin_config_content["schemaFile"]
@@ -82,9 +80,7 @@ def build(plugin_config, upload_artifact, generate_only, skip_id_validation):
     logger.debug("schemas found: %s", schemas)
 
     # Resolve the paths for source directory and schema file
-    src_dir = file_util.get_src_dir_path(
-        plugin_config, plugin_config_content["srcDir"]
-    )
+    src_dir = file_util.get_src_dir_path(plugin_config, plugin_config_content["srcDir"])
     logger.debug("Source directory path resolved is %s", src_dir)
 
     #
@@ -116,10 +112,7 @@ def build(plugin_config, upload_artifact, generate_only, skip_id_validation):
     #
     try:
         result = plugin_util.get_plugin_manifest(
-            plugin_config,
-            plugin_config_content,
-            not generate_only,
-            skip_id_validation,
+            plugin_config, plugin_config_content, not generate_only, skip_id_validation
         )
     except exceptions.UserError as err:
         raise exceptions.BuildFailedError(err)
@@ -128,9 +121,7 @@ def build(plugin_config, upload_artifact, generate_only, skip_id_validation):
     if result:
         plugin_manifest = result.plugin_manifest
         if result.warnings:
-            warning_msg = util_classes.MessageUtils.warning_msg(
-                result.warnings
-            )
+            warning_msg = util_classes.MessageUtils.warning_msg(result.warnings)
             logger.warn(
                 "{}\n{} Warning(s). {} Error(s).".format(
                     warning_msg, len(result.warnings["warning"]), 0
@@ -175,18 +166,14 @@ def prepare_upload_artifact(plugin_config_content, src_dir, schemas, manifest):
         "prettyName": plugin_config_content["name"],
         "version": plugin_config_content["version"],
         # set default value of locale to en-us
-        "defaultLocale": plugin_config_content.get(
-            "defaultLocale", LOCALE_DEFAULT
-        ),
+        "defaultLocale": plugin_config_content.get("defaultLocale", LOCALE_DEFAULT),
         # set default value of language to PYTHON27
         "language": plugin_config_content["language"],
         "hostTypes": plugin_config_content["hostTypes"],
         "entryPoint": plugin_config_content["entryPoint"],
         "buildApi": package_util.get_build_api_version(),
         "engineApi": package_util.get_engine_api_version(),
-        "rootSquashEnabled": plugin_config_content.get(
-            "rootSquashEnabled", True
-        ),
+        "rootSquashEnabled": plugin_config_content.get("rootSquashEnabled", True),
         "sourceCode": zip_and_encode_source_files(src_dir),
         "virtualSourceDefinition": {
             "type": VIRTUAL_SOURCE_TYPE,
@@ -237,9 +224,7 @@ def prepare_discovery_definition(config_content, schemas):
     return {
         "type": DISCOVERY_DEFINITION_TYPE,
         # set manualSourceConfigDiscovery to default value
-        "manualSourceConfigDiscovery": config_content.get(
-            "manualDiscovery", True
-        ),
+        "manualSourceConfigDiscovery": config_content.get("manualDiscovery", True),
         # identityFields in schema becomes repositoryIdentityFields
         "repositoryIdentityFields": schema_repo_def.pop("identityFields"),
         "repositoryNameField": schema_repo_def.pop("nameField", None),
@@ -301,9 +286,7 @@ def zip_and_encode_source_files(source_code_dir):
             for root, _, files in os.walk("."):
                 for filename in files:
                     if not filename.endswith(".py"):
-                        logger.debug(
-                            "Adding %s to zip.", os.path.join(root, filename)
-                        )
+                        logger.debug("Adding %s to zip.", os.path.join(root, filename))
                         zip_file.write(os.path.join(root, filename))
         encoded_bytes = base64.b64encode(out_file.getvalue())
         out_file.close()

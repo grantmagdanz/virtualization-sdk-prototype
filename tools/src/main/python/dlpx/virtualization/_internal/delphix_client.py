@@ -31,21 +31,14 @@ class DelphixClient(object):
         Takes in the engine_api, user, and password and attempts to login to
         the engine. Can raise HttpPostError and UnexpectedError.
         """
-        logger.info(
-            "Logging onto the Delphix Engine {!r}.".format(self.__engine)
-        )
+        logger.info("Logging onto the Delphix Engine {!r}.".format(self.__engine))
         self.__post(
-            "delphix/session",
-            data={"type": "APISession", "version": engine_api},
+            "delphix/session", data={"type": "APISession", "version": engine_api}
         )
         logger.debug("Session started successfully.")
         self.__post(
             "delphix/login",
-            data={
-                "type": "LoginRequest",
-                "username": user,
-                "password": password,
-            },
+            data={"type": "LoginRequest", "username": user, "password": password},
         )
         logger.info("Successfully logged in as {!r}.".format(user))
 
@@ -65,13 +58,9 @@ class DelphixClient(object):
                 and isinstance(engine_api.get("minor"), int)
                 and isinstance(engine_api.get("micro"), int)
             ):
-                logger.info(
-                    "engineApi found: {}.".format(json.dumps(engine_api))
-                )
+                logger.info("engineApi found: {}.".format(json.dumps(engine_api)))
                 return engine_api
-            logger.debug(
-                "engineApi found but malformed: {!r}".format(engine_api)
-            )
+            logger.debug("engineApi found but malformed: {!r}".format(engine_api))
         raise exceptions.InvalidArtifactError()
 
     def __post(self, resource, content_type="application/json", data=None):
@@ -115,9 +104,7 @@ class DelphixClient(object):
         try:
             response_json = response.json()
         except ValueError:
-            raise exceptions.UnexpectedError(
-                response.status_code, response.text
-            )
+            raise exceptions.UnexpectedError(response.status_code, response.text)
 
         logger.debug("Response body: {}".format(json.dumps(response_json)))
 
@@ -128,9 +115,7 @@ class DelphixClient(object):
             return response_json
 
         if response_json.get("type") == "ErrorResult":
-            raise exceptions.HttpError(
-                response.status_code, response_json["error"]
-            )
+            raise exceptions.HttpError(response.status_code, response_json["error"])
         raise exceptions.UnexpectedError(
             response.status_code, json.dumps(response_json, indent=2)
         )
@@ -219,8 +204,7 @@ class DelphixClient(object):
             True,
         )
         download_zip_name = "{}/{}".format(
-            directory,
-            "dlpx-plugin-logs-{}-{}.tar.gz".format(plugin_name, token),
+            directory, "dlpx-plugin-logs-{}-{}.tar.gz".format(plugin_name, token)
         )
         with open(download_zip_name, "wb") as f:
             for chunk in download_zip_data:
@@ -255,34 +239,26 @@ class DelphixClient(object):
         """
 
         # Get the name and id of the plugin from the plugin config.
-        plugin_name = plugin_util.get_plugin_config_property(
-            plugin_config, "name"
-        )
+        plugin_name = plugin_util.get_plugin_config_property(plugin_config, "name")
         plugin_id = plugin_util.get_plugin_config_property(plugin_config, "id")
 
         # Convert plugin id to object reference id.
         plugin_ref = self.__get_plugin_ref_from_id(plugin_name, plugin_id)
 
         # Get the download token.
-        logger.info(
-            "Getting token for download for plugin: {}.".format(plugin_ref)
-        )
+        logger.info("Getting token for download for plugin: {}.".format(plugin_ref))
         data = {
             "type": "SupportBundleGenerateParameters",
             "bundleType": "PLUGIN_LOG",
             "plugin": "{}".format(plugin_ref),
         }
-        response = self.__post(
-            "delphix/service/support/bundle/generate", data=data
-        )
+        response = self.__post("delphix/service/support/bundle/generate", data=data)
         token = response["result"].encode("utf-8").strip()
         logger.debug("Got token {!r} successfully.".format(token))
 
         self.__download_logs(plugin_name, token, directory)
 
-        logger.info(
-            "Plugin logs were successfully downloaded to {}.".format(directory)
-        )
+        logger.info("Plugin logs were successfully downloaded to {}.".format(directory))
 
     @staticmethod
     def __encode(content, token, filename):

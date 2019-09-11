@@ -50,9 +50,7 @@ def upload(engine, user, upload_artifact, password):
         raise exceptions.UserError(
             "Unable to read upload artifact file '{}'"
             "\nError code: {}. Error message: {}".format(
-                upload_artifact,
-                err.errno,
-                errno.errorcode.get(err.errno, UNKNOWN_ERR),
+                upload_artifact, err.errno, errno.errorcode.get(err.errno, UNKNOWN_ERR)
             )
         )
 
