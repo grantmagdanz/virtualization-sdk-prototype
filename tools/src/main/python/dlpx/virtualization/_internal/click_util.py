@@ -32,7 +32,8 @@ class ConfigFileProcessor(ConfigFileReader):
     """
 
     config_files = [
-        os.path.expanduser(os.path.join("~", CONFIG_DIR_NAME, CONFIG_FILE_NAME))
+        os.path.expanduser(os.path.join("~", CONFIG_DIR_NAME,
+         CONFIG_FILE_NAME))
     ]
     config_section_schemas = [ConfigSectionSchema.DvpProperties]
 
