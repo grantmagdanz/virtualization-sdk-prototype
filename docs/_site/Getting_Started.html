@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Getting Started | virtualization-sdk</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Getting Started" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/Getting_Started.html" />
+<meta property="og:url" content="http://localhost:4000/Getting_Started.html" />
+<meta property="og:site_name" content="virtualization-sdk" />
+<script type="application/ld+json">
+{"@type":"WebPage","url":"http://localhost:4000/Getting_Started.html","headline":"Getting Started","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=52f3c2ef1003e9fe35bc8813a5d4baa843da74c1">
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="http://localhost:4000/">virtualization-sdk</a></h1>
+      
+
+      <h1 id="getting-started">Getting Started</h1>
+<p>The Virtualization SDK is a Python package on <a href="https://pypi.org/project/dvp/">PyPI</a>. Install it in your local development environment so that you can build and upload a plugin.</p>
+
+<p>The SDK consists of three parts:</p>
+
+<ul>
+  <li>The <code class="highlighter-rouge">dlpx.virtulization.platform</code> module</li>
+  <li>The <code class="highlighter-rouge">dlpx.virtualization.libs</code> module</li>
+  <li>A CLI</li>
+</ul>
+
+<p>The platform and libs modules expose objects and methods needed to develop a plugin. The CLI is used to build and upload a plugin.</p>
+
+<h2 id="requirements">Requirements</h2>
+
+<ul>
+  <li>macOS 10.14+, Ubuntu 16.04+, or Windows 10</li>
+  <li>Python 2.7 (Python 3 is not supported)</li>
+  <li>Java 7+</li>
+</ul>
+
+<h2 id="installation">Installation</h2>
+<p>To install the latest version of the SDK run:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ pip install dvp
+</code></pre></div></div>
+
+<p>!!! tip “Use a Virtual Environment”
+	 We highly recommended that you develop plugins inside of a virtual environment. To learn more about virtual environments, refer to <a href="https://virtualenv.pypa.io/en/latest/">Virtualenv’s documentation</a>.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> The virtual environment needs to use Python 2.7. This is configured when creating the virtualenv:
+
+ ```$ virtualenv -p /path/to/python2.7/binary ENV```
+</code></pre></div></div>
+
+<p>To install a specific version of the SDK run:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ pip install dvp==&lt;version&gt;
+</code></pre></div></div>
+
+<p>To upgrade an existing installation of the SDK run:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ pip install dvp --upgrade
+</code></pre></div></div>
+
+<p>!!! note “API Build Version”
+    The version of the SDK defines the version of the Virtualization Platform API your plugin will be built against.</p>
+
+<h2 id="basic-usage">Basic Usage</h2>
+
+<p>Our <a href="/References/CLI.html">CLI reference</a> describes commands, provides examples, and a help section.</p>
+
+<p>To build your plugin:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ dvp build -c &lt;plugin_config&gt; -a &lt;artifact_file&gt;
+</code></pre></div></div>
+
+<p>This will generate an upload artifact at <code class="highlighter-rouge">&lt;artifact_file&gt;</code>. That file can then be uploaded with:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ dvp upload -e &lt;delphix_engine_address&gt; -u &lt;delphix_admin_user&gt; -a &lt;artifact_file&gt;
+</code></pre></div></div>
+
+<p>You will be prompt for the Delphix Engine user’s password.</p>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+
+<h4 id="installation-fails-with-incorrect-version-spec">Installation fails with incorrect version spec</h4>
+
+<p>!!! error
+    <code class="highlighter-rouge">'install_requires' must be a string or list of strings containing valid project version requirement specifiers; Expected version spec in enum34;python_version &lt; '3.4' at ;python_version &lt; '3.4'</code></p>
+
+<p>This is likely caused by an out of date <code class="highlighter-rouge">setuptools</code> version (minimum version <code class="highlighter-rouge">38.0.0</code>) which is often due to not installing the SDK into a virtual environment. To fix this, first setup a virtual environment and attempt to install the SDK there. If you are already using a virtual environment you can update <code class="highlighter-rouge">setuptools</code> with:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ pip install setuptools --upgrade
+</code></pre></div></div>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+    
+  </body>
+</html>

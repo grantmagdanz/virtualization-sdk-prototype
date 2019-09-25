@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Virtualization SDK | virtualization-sdk</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Virtualization SDK" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/References/Plugin_Operations.html" />
+<meta property="og:url" content="http://localhost:4000/References/Plugin_Operations.html" />
+<meta property="og:site_name" content="virtualization-sdk" />
+<script type="application/ld+json">
+{"@type":"WebPage","url":"http://localhost:4000/References/Plugin_Operations.html","headline":"Virtualization SDK","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=52f3c2ef1003e9fe35bc8813a5d4baa843da74c1">
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="http://localhost:4000/">virtualization-sdk</a></h1>
+      
+
+      <h1 id="plugin-operations">Plugin Operations</h1>
+
+<h2 id="summary">Summary</h2>
+<p>!!! warning
+    If a Plugin Operations is <strong>Required</strong> and is not present, the corresponding Delphix Engine Operation will fail when invoked. The plugin can still be built and uploaded to the Delphix Engine.</p>
+
+<p>!!! warning
+    For each operation, the argument names must match exactly. For example, the Repository Discovery
+    operation must have a single argument named <code class="highlighter-rouge">source_connection</code>.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Plugin Operation</th>
+      <th><strong>Required</strong></th>
+      <th>Decorator</th>
+      <th>Delphix Engine Operations</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="#repository-discovery">Repository<br />Discovery</a></td>
+      <td><strong>Yes</strong></td>
+      <td><code class="highlighter-rouge">discovery.repository()</code></td>
+      <td><a href="/References/Workflows.html#environment-discovery-refresh">Environment Discovery</a><br /><a href="/References/Workflows.html#environment-discovery-refresh">Environment Refresh</a></td>
+    </tr>
+    <tr>
+      <td><a href="#source-config-discovery">Source Config<br />Discovery</a></td>
+      <td><strong>Yes</strong></td>
+      <td><code class="highlighter-rouge">discovery.source_config()</code></td>
+      <td><a href="/References/Workflows.html#environment-discovery-refresh">Environment Discovery</a><br /><a href="/References/Workflows.html#environment-discovery-refresh">Environment Refresh</a></td>
+    </tr>
+    <tr>
+      <td><a href="#direct-linked-source-pre-snapshot">Direct Linked Source<br />Pre-Snapshot</a></td>
+      <td><strong>No</strong></td>
+      <td><code class="highlighter-rouge">linked.pre_snapshot()</code></td>
+      <td><a href="/References/Workflows.html#linked-source-sync">Linked Source Sync</a></td>
+    </tr>
+    <tr>
+      <td><a href="#direct-linked-source-post-snapshot">Direct Linked Source<br />Post-Snapshot</a></td>
+      <td><strong>Yes</strong></td>
+      <td><code class="highlighter-rouge">linked.post_snapshot()</code></td>
+      <td><a href="/References/Workflows.html#linked-source-sync">Linked Source Sync</a></td>
+    </tr>
+    <tr>
+      <td><a href="#staged-linked-source-pre-snapshot">Staged Linked Source<br />Pre-Snapshot</a></td>
+      <td><strong>No</strong></td>
+      <td><code class="highlighter-rouge">linked.pre_snapshot()</code></td>
+      <td><a href="/References/Workflows.html#linked-source-sync">Linked Source Sync</a></td>
+    </tr>
+    <tr>
+      <td><a href="#staged-linked-source-post-snapshot">Staged Linked Source<br />Post-Snapshot</a></td>
+      <td><strong>Yes</strong></td>
+      <td><code class="highlighter-rouge">linked.post_snapshot()</code></td>
+      <td><a href="/References/Workflows.html#linked-source-sync">Linked Source Sync</a></td>
+    </tr>
+    <tr>
+      <td><a href="#staged-linked-source-start-staging">Staged Linked Source<br />Start-Staging</a></td>
+      <td><strong>No</strong></td>
+      <td><code class="highlighter-rouge">linked.start_staging()</code></td>
+      <td><a href="/References/Workflows.html#linked-source-enable">Linked Source Enable</a></td>
+    </tr>
+    <tr>
+      <td><a href="#staged-linked-source-stop-staging">Staged Linked Source<br />Stop-Staging</a></td>
+      <td><strong>No</strong></td>
+      <td><code class="highlighter-rouge">linked.stop_staging()</code></td>
+      <td><a href="/References/Workflows.html#linked-source-disable">Linked Source Disable</a><br /><a href="/References/Workflows.html#linked-source-delete">Linked Source Delete</a></td>
+    </tr>
+    <tr>
+      <td><a href="#staged-linked-source-status">Staged Linked Source<br />Status</a></td>
+      <td><strong>No</strong></td>
+      <td><code class="highlighter-rouge">linked.status()</code></td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td><a href="#staged-linked-source-worker">Staged Linked Source<br />Worker</a></td>
+      <td><strong>No</strong></td>
+      <td><code class="highlighter-rouge">linked.worker()</code></td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td><a href="#staged-linked-source-mount-specification">Staged Linked Source<br />Mount Specification</a></td>
+      <td><strong>Yes</strong></td>
+      <td><code class="highlighter-rouge">linked.mount_specification()</code></td>
+      <td><a href="/References/Workflows.html#linked-source-sync">Linked Source Sync</a><br /><a href="/References/Workflows.html#linked-source-enable">Linked Source Enable</a></td>
+    </tr>
+    <tr>
+      <td><a href="#virtual-source-configure">Virtual Source<br />Configure</a></td>
+      <td><strong>Yes</strong></td>
+      <td><code class="highlighter-rouge">virtual.configure()</code></td>
+      <td><a href="/References/Workflows.html#virtual-source-provision">Virtual Source Provision</a><br /><a href="/References/Workflows.html#virtual-source-refresh">Virtual Source Refresh</a></td>
+    </tr>
+    <tr>
+      <td><a href="#virtual-source-unconfigure">Virtual Source<br />Unconfigure</a></td>
+      <td><strong>No</strong></td>
+      <td><code class="highlighter-rouge">virtual.unconfigure()</code></td>
+      <td><a href="/References/Workflows.html#virtual-source-refresh">Virtual Source Refresh</a><br /><a href="/References/Workflows.html#virtual-source-delete">Virtual Source Delete</a></td>
+    </tr>
+    <tr>
+      <td><a href="#virtual-source-reconfigure">Virtual Source<br />Reconfigure</a></td>
+      <td><strong>Yes</strong></td>
+      <td><code class="highlighter-rouge">virtual.reconfigure()</code></td>
+      <td><a href="/References/Workflows.html#virtual-source-rollback">Virtual Source Rollback</a><br /><a href="/References/Workflows.html#virtual-source-enable">Virtual Source Enable</a></td>
+    </tr>
+    <tr>
+      <td><a href="#virtual-source-start">Virtual Source<br />Start</a></td>
+      <td><strong>No</strong></td>
+      <td><code class="highlighter-rouge">virtual.start()</code></td>
+      <td><a href="/References/Workflows.html#virtual-source-start">Virtual Source Start</a></td>
+    </tr>
+    <tr>
+      <td><a href="#virtual-source-stop">Virtual Source<br />Stop</a></td>
+      <td><strong>No</strong></td>
+      <td><code class="highlighter-rouge">virtual.stop()</code></td>
+      <td><a href="/References/Workflows.html#virtual-source-stop">Virtual Source Stop</a></td>
+    </tr>
+    <tr>
+      <td><a href="#virtual-source-pre-snapshot">Virtual Source<br />Pre-Snapshot</a></td>
+      <td><strong>No</strong></td>
+      <td><code class="highlighter-rouge">virtual.pre_snapshot()</code></td>
+      <td><a href="/References/Workflows.html#virtual-source-snapshot">Virtual Source Snapshot</a></td>
+    </tr>
+    <tr>
+      <td><a href="#virtual-source-post-snapshot">Virtual Source<br />Post-Snapshot</a></td>
+      <td><strong>Yes</strong></td>
+      <td><code class="highlighter-rouge">virtual.post_snapshot()</code></td>
+      <td><a href="/References/Workflows.html#virtual-source-snapshot">Virtual Source Snapshot</a></td>
+    </tr>
+    <tr>
+      <td><a href="#virtual-source-mount-specification">Virtual Source<br />Mount Specification</a></td>
+      <td><strong>Yes</strong></td>
+      <td><code class="highlighter-rouge">virtual.mount_specification()</code></td>
+      <td><a href="/References/Workflows.html#virtual-source-enable">Virtual Source Enable</a><br /><a href="/References/Workflows.html#virtual-source-provision">Virtual Source Provision</a><br /><a href="/References/Workflows.html#virtual-source-refresh">Virtual Source Refresh</a><br /><a href="/References/Workflows.html#virtual-source-rollback">Virtual Source Rollback</a><br /><a href="/References/Workflows.html#virtual-source-start">Virtual Source Start</a></td>
+    </tr>
+    <tr>
+      <td><a href="#virtual-source-status">Virtual Source<br />Status</a></td>
+      <td><strong>No</strong></td>
+      <td><code class="highlighter-rouge">virtual.status()</code></td>
+      <td><a href="/References/Workflows.html#virtual-source-enable">Virtual Source Enable</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="repository-discovery">Repository Discovery</h2>
+
+<p>Discovers the set of <a href="/References/Glossary.html#repository">repositories</a> for a plugin on an <a href="/References/Glossary.html#environment">environment</a>. For a DBMS, this can correspond to the set of binaries installed on a Unix host.</p>
+
+<h3 id="required--optional">Required / Optional</h3>
+<p><strong>Required.</strong></p>
+
+<h3 id="delphix-engine-operations">Delphix Engine Operations</h3>
+
+<ul>
+  <li><a href="/References/Workflows.html#environment-discovery-refresh">Environment Refresh</a></li>
+  <li><a href="/References/Workflows.html#environment-discovery-refresh">Environment Discovery</a></li>
+</ul>
+
+<h3 id="signature">Signature</h3>
+
+<p><code class="highlighter-rouge">def repository_discovery(source_connection)</code></p>
+
+<h3 id="decorator">Decorator</h3>
+
+<p><code class="highlighter-rouge">discovery.repository()</code></p>
+
+<h3 id="arguments">Arguments</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>source_connection</td>
+      <td><a href="/References/Classes.html#remoteconnection">RemoteConnection</a></td>
+      <td>The connection associated with the remote environment to run repository discovery</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="returns">Returns</h3>
+
+<p>A list of <a href="/References/Schemas_and_Autogenerated_Classes.html#repositorydefinition-class">RepositoryDefinition</a> objects.</p>
+
+<h3 id="example">Example</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+<span class="kn">from</span> <span class="nn">generated.defintions</span> <span class="kn">import</span> <span class="n">RepositoryDefinition</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.discovery.repository</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">repository_discovery</span><span class="p">(</span><span class="n">source_connection</span><span class="p">):</span>  
+  <span class="n">repository</span> <span class="o">=</span> <span class="n">RepositoryDefinition</span><span class="p">()</span>
+  <span class="n">repository</span><span class="o">.</span><span class="n">installPath</span> <span class="o">=</span> <span class="s">"/usr/bin/install"</span>
+  <span class="n">repository</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="s">"1.2.3"</span>
+  <span class="k">return</span> <span class="p">[</span><span class="n">repository</span><span class="p">]</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>The above command assumes a <a href="/References/Schemas_and_Autogenerated_Classes.html#repositorydefinition-schema">Repository Schema</a> defined as:</p>
+</blockquote>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"additionalProperties"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"installPath"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"version"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w"> </span><span class="p">}</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="s2">"identityFields"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"installPath"</span><span class="p">],</span><span class="w">
+  </span><span class="s2">"nameField"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"installPath"</span><span class="p">]</span><span class="w">    
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="source-config-discovery">Source Config Discovery</h2>
+
+<p>Discovers the set of <a href="/References/Glossary.html#source-config">source configs</a> for a plugin for a <a href="/References/Glossary.html#repository">repository</a>. For a DBMS, this can correspond to the set of unique databases running using a particular installation on a Unix host.</p>
+
+<h3 id="required--optional-1">Required / Optional</h3>
+<p><strong>Required.</strong></p>
+
+<h3 id="delphix-engine-operations-1">Delphix Engine Operations</h3>
+
+<ul>
+  <li><a href="/References/Workflows.html#environment-discovery-refresh">Environment Refresh</a></li>
+  <li><a href="/References/Workflows.html#environment-discovery-refresh">Environment Discovery</a></li>
+</ul>
+
+<h3 id="signature-1">Signature</h3>
+
+<p><code class="highlighter-rouge">def source_config_discovery(source_connection, repository)</code></p>
+
+<h3 id="decorator-1">Decorator</h3>
+
+<p><code class="highlighter-rouge">discovery.source_config()</code></p>
+
+<h3 id="arguments-1">Arguments</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>source_connection</td>
+      <td><a href="/References/Classes.html#remoteconnection">RemoteConnection</a></td>
+      <td>The connection to the remote environment the corresponds to the repository.</td>
+    </tr>
+    <tr>
+      <td>repository</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#repositorydefinition-class">RepositoryDefinition</a></td>
+      <td>The repository to discover source configs for.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="returns-1">Returns</h3>
+<p>A list of <a href="/References/Schemas_and_Autogenerated_Classes.html#sourceconfigdefinition-class">SourceConfigDefinition</a> objects.</p>
+
+<h3 id="example-1">Example</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+<span class="kn">from</span> <span class="nn">generated.definitions</span> <span class="kn">import</span> <span class="n">SourceConfigDefinition</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.discovery.source_config</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">source_config_discovery</span><span class="p">(</span><span class="n">source_connection</span><span class="p">,</span> <span class="n">repository</span><span class="p">):</span>
+  <span class="n">source_config</span> <span class="o">=</span> <span class="n">SourceConfigDefinition</span><span class="p">()</span>
+  <span class="n">source_config</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">"my_name"</span>
+  <span class="n">source_config</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="mi">10000</span>
+  <span class="k">return</span> <span class="p">[</span><span class="n">source_config</span><span class="p">]</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>The above command assumes a <a href="/References/Schemas_and_Autogenerated_Classes.html#sourceconfigdefinition-schema">Source Config Schema</a> defined as:</p>
+</blockquote>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"additionalProperties"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"port"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"number"</span><span class="w"> </span><span class="p">}</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="s2">"identityFields"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span><span class="w">
+  </span><span class="s2">"nameField"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"name"</span><span class="p">]</span><span class="w">    
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="direct-linked-source-pre-snapshot">Direct Linked Source Pre-Snapshot</h2>
+
+<p>Sets up a <a href="/References/Glossary.html#dsource">dSource</a> to ingest data. Only applies when using a <a href="/References/Glossary.html#direct-linking">Direct Linking</a> strategy.</p>
+
+<h3 id="required--optional-2">Required / Optional</h3>
+<p><strong>Optional</strong></p>
+
+<h3 id="delphix-engine-operations-2">Delphix Engine Operations</h3>
+
+<ul>
+  <li><a href="/References/Workflows.html#linked-source-sync">Linked Source Sync</a></li>
+</ul>
+
+<h3 id="signature-2">Signature</h3>
+
+<p><code class="highlighter-rouge">def linked_pre_snapshot(direct_source, repository, source_config)</code></p>
+
+<h3 id="decorator-2">Decorator</h3>
+
+<p><code class="highlighter-rouge">linked.pre_snapshot()</code></p>
+
+<h3 id="arguments-2">Arguments</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>direct_source</td>
+      <td><a href="/References/Classes.html#directsource">DirectSource</a></td>
+      <td>The source associated with this operation.</td>
+    </tr>
+    <tr>
+      <td>repository</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#repositorydefinition-class">RepositoryDefinition</a></td>
+      <td>The repository associated with this source.</td>
+    </tr>
+    <tr>
+      <td>source_config</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#sourceconfigdefinition-class">SourceConfigDefinition</a></td>
+      <td>The source config associated with this source.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="returns-2">Returns</h3>
+<p>None</p>
+
+<h3 id="example-2">Example</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+<span class="kn">from</span> <span class="nn">generated.definitions</span> <span class="kn">import</span> <span class="n">SourceConfigDefinition</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.linked.pre_snapshot</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">linked_pre_snapshot</span><span class="p">(</span><span class="n">direct_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">source_config</span><span class="p">):</span>
+  <span class="k">pass</span>
+</code></pre></div></div>
+
+<h2 id="direct-linked-source-post-snapshot">Direct Linked Source Post-Snapshot</h2>
+
+<p>Captures metadata from a <a href="/References/Glossary.html#dsource">dSource</a> once data has been ingested. Only applies when using a <a href="/References/Glossary.html#direct-linking">Direct Linking</a> strategy.</p>
+
+<h3 id="required--optional-3">Required / Optional</h3>
+<p><strong>Required.</strong></p>
+
+<h3 id="delphix-engine-operations-3">Delphix Engine Operations</h3>
+
+<ul>
+  <li><a href="/References/Workflows.html#linked-source-sync">Linked Source Sync</a></li>
+</ul>
+
+<h3 id="signature-3">Signature</h3>
+
+<p><code class="highlighter-rouge">def linked_post_snapshot(direct_source, repository, source_config)</code></p>
+
+<h3 id="decorator-3">Decorator</h3>
+
+<p><code class="highlighter-rouge">linked.post_snapshot()</code></p>
+
+<h3 id="arguments-3">Arguments</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>direct_source</td>
+      <td><a href="/References/Classes.html#directsource">DirectSource</a></td>
+      <td>The source associated with this operation.</td>
+    </tr>
+    <tr>
+      <td>repository</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#repositorydefinition-class">RepositoryDefinition</a></td>
+      <td>The repository associated with this source.</td>
+    </tr>
+    <tr>
+      <td>source_config</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#sourceconfigdefinition-class">SourceConfigDefinition</a></td>
+      <td>The source config associated with this source.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="returns-3">Returns</h3>
+<p><a href="/References/Schemas_and_Autogenerated_Classes.html#snapshotdefinition-class">SnapshotDefinition</a></p>
+
+<h3 id="example-3">Example</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+<span class="kn">from</span> <span class="nn">generated.definitions</span> <span class="kn">import</span> <span class="n">SnapshotDefinition</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.linked.post_snapshot</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">linked_post_snapshot</span><span class="p">(</span><span class="n">direct_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">source_config</span><span class="p">):</span>
+  <span class="n">snapshot</span> <span class="o">=</span> <span class="n">SnapshotDefinition</span><span class="p">()</span>
+  <span class="n">snapshot</span><span class="o">.</span><span class="n">transaction_id</span> <span class="o">=</span> <span class="mi">1000</span>
+  <span class="k">return</span> <span class="n">snapshot</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>The above command assumes a <a href="/References/Schemas_and_Autogenerated_Classes.html#snapshot-schema">Snapshot Schema</a> defined as:</p>
+</blockquote>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"additionalProperties"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"transactionId"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"integer"</span><span class="w"> </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="staged-linked-source-pre-snapshot">Staged Linked Source Pre-Snapshot</h2>
+
+<p>Sets up a <a href="/References/Glossary.html#dsource">dSource</a> to ingest data. Only applies when using a <a href="/References/Glossary.html#staged-linking">Staged Linking</a> strategy.</p>
+
+<h3 id="required--optional-4">Required / Optional</h3>
+<p><strong>Optional.</strong></p>
+
+<h3 id="delphix-engine-operations-4">Delphix Engine Operations</h3>
+
+<ul>
+  <li><a href="/References/Workflows.html#linked-source-sync">Linked Source Sync</a></li>
+</ul>
+
+<h3 id="signature-4">Signature</h3>
+
+<p><code class="highlighter-rouge">def linked_pre_snapshot(staged_source, repository, source_config, snapshot_parameters)</code></p>
+
+<h3 id="decorator-4">Decorator</h3>
+
+<p><code class="highlighter-rouge">linked.pre_snapshot()</code></p>
+
+<h3 id="arguments-4">Arguments</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>staged_source</td>
+      <td><a href="/References/Classes.html#stagedsource">StagedSource</a></td>
+      <td>The source associated with this operation.</td>
+    </tr>
+    <tr>
+      <td>repository</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#repositorydefinition-class">RepositoryDefinition</a></td>
+      <td>The repository associated with this source.</td>
+    </tr>
+    <tr>
+      <td>source_config</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#sourceconfigdefinition-class">SourceConfigDefinition</a></td>
+      <td>The source config associated with this source.</td>
+    </tr>
+    <tr>
+      <td>snapshot_parameters</td>
+      <td><a href="/References/Classes.html#snapshotparametersdefinition">SnapshotParametersDefinition</a></td>
+      <td>The snapshot parameters.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="returns-4">Returns</h3>
+<p>None</p>
+
+<h3 id="example-4">Example</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.linked.pre_snapshot</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">linked_pre_snapshot</span><span class="p">(</span><span class="n">staged_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">source_config</span><span class="p">,</span> <span class="n">snapshot_parameters</span><span class="p">):</span>
+  <span class="k">pass</span>
+</code></pre></div></div>
+
+<h2 id="staged-linked-source-post-snapshot">Staged Linked Source Post-Snapshot</h2>
+
+<p>Captures metadata from a <a href="/References/Glossary.html#dsource">dSource</a> once data has been ingested. Only applies when using a <a href="/References/Glossary.html#staged-linking">Staged Linking</a> strategy.</p>
+
+<h3 id="required--optional-5">Required / Optional</h3>
+<p><strong>Required.</strong></p>
+
+<h3 id="delphix-engine-operations-5">Delphix Engine Operations</h3>
+
+<ul>
+  <li><a href="/References/Workflows.html#linked-source-sync">Linked Source Sync</a></li>
+</ul>
+
+<h3 id="signature-5">Signature</h3>
+
+<p><code class="highlighter-rouge">def linked_post_snapshot(staged_source, repository, source_config, snapshot_parameters)</code></p>
+
+<h3 id="decorator-5">Decorator</h3>
+
+<p><code class="highlighter-rouge">linked.post_snapshot()</code></p>
+
+<h3 id="arguments-5">Arguments</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>staged_source</td>
+      <td><a href="/References/Classes.html#stagedsource">StagedSource</a></td>
+      <td>The source associated with this operation.</td>
+    </tr>
+    <tr>
+      <td>repository</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#repositorydefinition-class">RepositoryDefinition</a></td>
+      <td>The repository associated with this source.</td>
+    </tr>
+    <tr>
+      <td>source_config</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#sourceconfigdefinition-class">SourceConfigDefinition</a></td>
+      <td>The source config associated with this source.</td>
+    </tr>
+    <tr>
+      <td>snapshot_parameters</td>
+      <td><a href="/References/Classes.html#snapshotparametersdefinition">SnapshotParametersDefinition</a></td>
+      <td>The snapshot parameters.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="returns-5">Returns</h3>
+<p><a href="/References/Schemas_and_Autogenerated_Classes.html#snapshotdefinition-class">SnapshotDefinition</a></p>
+
+<h3 id="example-5">Example</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+<span class="kn">from</span> <span class="nn">generated.definitions</span> <span class="kn">import</span> <span class="n">SnapshotDefinition</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.linked.post_snapshot</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">linked_post_snapshot</span><span class="p">(</span><span class="n">staged_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">source_config</span><span class="p">,</span> <span class="n">snapshot_parameters</span><span class="p">):</span>
+  <span class="n">snapshot</span> <span class="o">=</span> <span class="n">SnapshotDefinition</span><span class="p">()</span>
+  <span class="k">if</span> <span class="n">snapshot_parameters</span><span class="o">.</span><span class="n">resync</span><span class="p">:</span>
+    <span class="n">snapshot</span><span class="o">.</span><span class="n">transaction_id</span> <span class="o">=</span> <span class="mi">1000</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">snapshot</span><span class="o">.</span><span class="n">transaction_id</span> <span class="o">=</span> <span class="mi">10</span>
+  <span class="k">return</span> <span class="n">snapshot</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>The above command assumes a <a href="/References/Schemas_and_Autogenerated_Classes.html#snapshot-schema">Snapshot Schema</a> defined as:</p>
+</blockquote>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"additionalProperties"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"transactionId"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"integer"</span><span class="w"> </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="staged-linked-source-start-staging">Staged Linked Source Start-Staging</h2>
+
+<p>Sets up a <a href="/References/Glossary.html#staging-source">Staging Source</a> to ingest data. Only applies when using a <a href="/References/Glossary.html#staged-linking">Staged Linking</a> strategy.
+Required to implement for Delphix Engine operations:</p>
+
+<h3 id="required--optional-6">Required / Optional</h3>
+<p><strong>Optional.</strong></p>
+
+<h3 id="delphix-engine-operations-6">Delphix Engine Operations</h3>
+
+<ul>
+  <li><a href="/References/Workflows.html#linked-source-enable">Linked Source Enable</a></li>
+</ul>
+
+<h3 id="signature-6">Signature</h3>
+
+<p><code class="highlighter-rouge">def start_staging(staged_source, repository, source_config)</code></p>
+
+<h3 id="decorator-6">Decorator</h3>
+
+<p><code class="highlighter-rouge">linked.start_staging()</code></p>
+
+<h3 id="arguments-6">Arguments</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>staged_source</td>
+      <td><a href="/References/Classes.html#stagedsource">StagedSource</a></td>
+      <td>The source associated with this operation.</td>
+    </tr>
+    <tr>
+      <td>repository</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#repositorydefinition-class">RepositoryDefinition</a></td>
+      <td>The repository associated with this source.</td>
+    </tr>
+    <tr>
+      <td>source_config</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#sourceconfigdefinition-class">SourceConfigDefinition</a></td>
+      <td>The source config associated with this source.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="returns-6">Returns</h3>
+<p>None</p>
+
+<h3 id="example-6">Example</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.linked.start_staging</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">start_staging</span><span class="p">(</span><span class="n">staged_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">source_config</span><span class="p">):</span>
+  <span class="k">pass</span>
+</code></pre></div></div>
+
+<h2 id="staged-linked-source-stop-staging">Staged Linked Source Stop-Staging</h2>
+
+<p>Quiesces a <a href="/References/Glossary.html#staging-source">Staging Source</a> to pause ingestion. Only applies when using a <a href="/References/Glossary.html#staged-linking">Staged Linking</a> strategy.</p>
+
+<h3 id="required--optional-7">Required / Optional</h3>
+<p><strong>Optional.</strong></p>
+
+<h3 id="delphix-engine-operations-7">Delphix Engine Operations</h3>
+
+<ul>
+  <li><a href="/References/Workflows.html#linked-source-disable">Linked Source Disable</a></li>
+  <li><a href="/References/Workflows.html#linked-source-delete">Linked Source Delete</a></li>
+</ul>
+
+<h3 id="signature-7">Signature</h3>
+
+<p><code class="highlighter-rouge">def stop_staging(staged_source, repository, source_config)</code></p>
+
+<h3 id="decorator-7">Decorator</h3>
+
+<p><code class="highlighter-rouge">linked.stop_staging()</code></p>
+
+<h3 id="arguments-7">Arguments</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>staged_source</td>
+      <td><a href="/References/Classes.html#stagedsource">StagedSource</a></td>
+      <td>The source associated with this operation.</td>
+    </tr>
+    <tr>
+      <td>repository</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#repositorydefinition-class">RepositoryDefinition</a></td>
+      <td>The repository associated with this source.</td>
+    </tr>
+    <tr>
+      <td>source_config</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#sourceconfigdefinition-class">SourceConfigDefinition</a></td>
+      <td>The source config associated with this source.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="returns-7">Returns</h3>
+<p>None</p>
+
+<p>###Examples</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.linked.stop_staging</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">stop_staging</span><span class="p">(</span><span class="n">staged_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">source_config</span><span class="p">):</span>
+  <span class="k">pass</span>
+</code></pre></div></div>
+
+<h2 id="staged-linked-source-status">Staged Linked Source Status</h2>
+
+<p>Determines the status of a <a href="/References/Glossary.html#staging-source">Staging Source</a> to show end users whether it is healthy or not. Only applies when using a <a href="/References/Glossary.html#staged-linking">Staged Linking</a> strategy.</p>
+
+<h3 id="required--optional-8">Required / Optional</h3>
+<p><strong>Optional.</strong><br />
+If not implemented, the platform assumes that the status is <code class="highlighter-rouge">Status.ACTIVE</code></p>
+
+<h3 id="delphix-engine-operations-8">Delphix Engine Operations</h3>
+
+<p>N/A</p>
+
+<h3 id="signature-8">Signature</h3>
+
+<p><code class="highlighter-rouge">def linked_status(staged_source, repository, source_config)</code></p>
+
+<h3 id="decorator-8">Decorator</h3>
+
+<p><code class="highlighter-rouge">linked.status()</code></p>
+
+<h3 id="arguments-8">Arguments</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>staged_source</td>
+      <td><a href="/References/Classes.html#stagedsource">StagedSource</a></td>
+      <td>The source associated with this operation.</td>
+    </tr>
+    <tr>
+      <td>repository</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#repositorydefinition-class">RepositoryDefinition</a></td>
+      <td>The repository associated with this source.</td>
+    </tr>
+    <tr>
+      <td>source_config</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#sourceconfigdefinition-class">SourceConfigDefinition</a></td>
+      <td>The source config associated with this source.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="returns-8">Returns</h3>
+<p><a href="/References/Classes.html#status">Status</a><br />
+<code class="highlighter-rouge">Status.ACTIVE</code> if the plugin operation is not implemented.</p>
+
+<h3 id="example-7">Example</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+<span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Status</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.linked.status</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">linked_status</span><span class="p">(</span><span class="n">staged_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">source_config</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">Status</span><span class="o">.</span><span class="n">ACTIVE</span>
+</code></pre></div></div>
+
+<h2 id="staged-linked-source-worker">Staged Linked Source Worker</h2>
+
+<p>Monitors the status of a <a href="/References/Glossary.html#staging-source">Staging Source</a> on a reqular interval. It can be used to fix up any errors on staging if it is not functioning as expected. Only applies when using a <a href="/References/Glossary.html#staged-linking">Staged Linking</a> strategy.</p>
+
+<h3 id="required--optional-9">Required / Optional</h3>
+<p><strong>Optional.</strong></p>
+
+<h3 id="delphix-engine-operations-9">Delphix Engine Operations</h3>
+
+<p>N/A</p>
+
+<h3 id="signature-9">Signature</h3>
+
+<p><code class="highlighter-rouge">def worker(staged_source, repository, source_config)</code></p>
+
+<h3 id="decorator-9">Decorator</h3>
+
+<p><code class="highlighter-rouge">linked.worker()</code></p>
+
+<h3 id="arguments-9">Arguments</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>staged_source</td>
+      <td><a href="/References/Classes.html#stagedsource">StagedSource</a></td>
+      <td>The source associated with this operation.</td>
+    </tr>
+    <tr>
+      <td>repository</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#repositorydefinition-class">RepositoryDefinition</a></td>
+      <td>The repository associated with this source.</td>
+    </tr>
+    <tr>
+      <td>source_config</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#sourceconfigdefinition-class">SourceConfigDefinition</a></td>
+      <td>The source config associated with this source.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="returns-9">Returns</h3>
+<p>None</p>
+
+<h3 id="example-8">Example</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.linked.worker</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">worker</span><span class="p">(</span><span class="n">staged_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">source_config</span><span class="p">):</span>
+  <span class="k">pass</span>
+</code></pre></div></div>
+
+<h2 id="staged-linked-source-mount-specification">Staged Linked Source Mount Specification</h2>
+
+<p>Returns configurations for the mounts associated for data in staged source. The <code class="highlighter-rouge">ownership_specification</code> is optional. If not specified, the platform will default the ownership settings to the environment user used for the Delphix Operation.</p>
+
+<h3 id="required--optional-10">Required / Optional</h3>
+<p><strong>Required.</strong></p>
+
+<h3 id="delphix-engine-operations-10">Delphix Engine Operations</h3>
+
+<ul>
+  <li><a href="/References/Workflows.html#linked-source-sync">Linked Source Sync</a></li>
+  <li><a href="/References/Workflows.html#linked-source-enable">Linked Source Enable</a></li>
+</ul>
+
+<h3 id="signature-10">Signature</h3>
+
+<p><code class="highlighter-rouge">def linked_mount_specification(staged_source, repository)</code></p>
+
+<h3 id="decorator-10">Decorator</h3>
+
+<p><code class="highlighter-rouge">linked.mount_specification()</code></p>
+
+<h3 id="arguments-10">Arguments</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>staged_source</td>
+      <td><a href="/References/Classes.html#stagedsource">StagedSource</a></td>
+      <td>The source associated with this operation.</td>
+    </tr>
+    <tr>
+      <td>repository</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#repositorydefinition-class">RepositoryDefinition</a></td>
+      <td>The repository associated with this source.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="returns-10">Returns</h3>
+<p><a href="/References/Classes.html#mountspecification">MountSpecification</a></p>
+
+<h3 id="example-9">Example</h3>
+
+<p>!!! info
+    <code class="highlighter-rouge">ownership_specification</code> only applies to Unix hosts.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+<span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Mount</span>
+<span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">MountSpecification</span>
+<span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">OwenershipSpecification</span>
+<span class="kn">from</span> <span class="nn">generated.definitions</span> <span class="kn">import</span> <span class="n">SnapshotDefinition</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.linked.mount_specification</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">linked_mount_specification</span><span class="p">(</span><span class="n">staged_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">):</span>
+  <span class="n">mount</span> <span class="o">=</span> <span class="n">Mount</span><span class="p">(</span><span class="n">staged_source</span><span class="o">.</span><span class="n">staged_connection</span><span class="o">.</span><span class="n">environment</span><span class="p">,</span> <span class="s">"/some/path"</span><span class="p">)</span>
+  <span class="n">ownership_spec</span> <span class="o">=</span> <span class="n">OwenershipSpecification</span><span class="p">(</span><span class="n">repository</span><span class="o">.</span><span class="n">uid</span><span class="p">,</span> <span class="n">repository</span><span class="o">.</span><span class="n">gid</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="n">MountSpecification</span><span class="p">([</span><span class="n">mount</span><span class="p">],</span> <span class="n">ownership_spec</span><span class="p">)</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>The above command assumes a <a href="/References/Schemas_and_Autogenerated_Classes.html#repository-schema">Repository Schema</a> defined as:</p>
+</blockquote>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"additionalProperties"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"uid"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"integer"</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"gid"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"integer"</span><span class="w"> </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="virtual-source-configure">Virtual Source Configure</h2>
+
+<p>Configures the data in a particular snapshot to be usable on a target environment. For database data files, this may mean recovering from a crash consistent format or backup. For application files, this may mean reconfiguring XML files or rewriting hostnames and symlinks.</p>
+
+<h3 id="required--optional-11">Required / Optional</h3>
+<p><strong>Required.</strong></p>
+
+<h3 id="delphix-engine-operations-11">Delphix Engine Operations</h3>
+
+<ul>
+  <li><a href="/References/Workflows.html#virtual-source-provision">Virtual Source Provision</a></li>
+  <li><a href="/References/Workflows.html#virtual-source-refresh">Virtual Source Refresh</a></li>
+</ul>
+
+<h3 id="signature-11">Signature</h3>
+
+<p><code class="highlighter-rouge">def configure(virtual_source, snapshot, repository)</code></p>
+
+<h3 id="decorator-11">Decorator</h3>
+
+<p><code class="highlighter-rouge">virtual.configure()</code></p>
+
+<h3 id="arguments-11">Arguments</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>virtual_source</td>
+      <td><a href="/References/Classes.html#virtualsource">VirtualSource</a></td>
+      <td>The source associated with this operation.</td>
+    </tr>
+    <tr>
+      <td>snapshot</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#snapshotdefinition-class">SnapshotDefinition</a></td>
+      <td>The snapshot of the data set to configure.</td>
+    </tr>
+    <tr>
+      <td>repository</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#repositorydefinition-class">RepositoryDefinition</a></td>
+      <td>The repository associated with this source.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="returns-11">Returns</h3>
+<p><a href="/References/Schemas_and_Autogenerated_Classes.html#sourceconfigdefinition-class">SourceConfigDefinition</a></p>
+
+<h3 id="example-10">Example</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+<span class="kn">from</span> <span class="nn">generated.defintions</span> <span class="kn">import</span> <span class="n">SourceConfigDefinition</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.virtual.configure</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="n">virtual_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">):</span>
+  <span class="n">name</span> <span class="o">=</span> <span class="s">"config_name"</span>
+  <span class="n">source_config</span> <span class="o">=</span> <span class="n">SourceConfigDefinition</span><span class="p">()</span>
+  <span class="n">source_config</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+  <span class="k">return</span> <span class="n">source_config</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>The above command assumes a <a href="/References/Schemas_and_Autogenerated_Classes.html#sourceconfig-schema">SourceConfig Schema</a> defined as:</p>
+</blockquote>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"required"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span><span class="w">
+  </span><span class="s2">"additionalProperties"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w"> </span><span class="p">}</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="s2">"identityFields"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span><span class="w">
+  </span><span class="s2">"nameField"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"name"</span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="virtual-source-unconfigure">Virtual Source Unconfigure</h2>
+
+<p>Quiesces the virtual source on a target environment. For database data files, shutting down and unregistering a database on a host.</p>
+
+<h3 id="required--optional-12">Required / Optional</h3>
+<p><strong>Optional.</strong></p>
+
+<h3 id="delphix-engine-operations-12">Delphix Engine Operations</h3>
+
+<ul>
+  <li><a href="/References/Workflows.html#virtual-source-refresh">Virtual Source Refresh</a></li>
+  <li><a href="/References/Workflows.html#virtual-source-delete">Virtual Source Delete</a></li>
+</ul>
+
+<h3 id="signature-12">Signature</h3>
+
+<p><code class="highlighter-rouge">def unconfigure(virtual_source, repository, source_config)</code></p>
+
+<h3 id="decorator-12">Decorator</h3>
+
+<p><code class="highlighter-rouge">virtual.unconfigure()</code></p>
+
+<h3 id="arguments-12">Arguments</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>virtual_source</td>
+      <td><a href="/References/Classes.html#virtualsource">VirtualSource</a></td>
+      <td>The source associated with this operation.</td>
+    </tr>
+    <tr>
+      <td>repository</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#repositorydefinition-class">RepositoryDefinition</a></td>
+      <td>The repository associated with this source.</td>
+    </tr>
+    <tr>
+      <td>source_config</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#sourceconfigdefinition-class">SourceConfigDefinition</a></td>
+      <td>The source config associated with this source.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="returns-12">Returns</h3>
+<p>None</p>
+
+<h3 id="example-11">Example</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.virtual.unconfigure</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">unconfigure</span><span class="p">(</span><span class="n">virtual_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">source_config</span><span class="p">):</span>
+  <span class="k">pass</span>
+</code></pre></div></div>
+
+<h2 id="virtual-source-reconfigure">Virtual Source Reconfigure</h2>
+
+<p>Re-configures the data for a virtual source to point to the data in a prior snapshot for the virtual source. For database data files, this may mean recovering from a crash consistent format or backup of a new snapshot. For application files, this may mean reconfiguring XML files or rewriting hostnames and symlinks.</p>
+
+<h3 id="required--optional-13">Required / Optional</h3>
+<p><strong>Required.</strong></p>
+
+<h3 id="delphix-engine-operations-13">Delphix Engine Operations</h3>
+
+<ul>
+  <li><a href="/References/Workflows.html#virtual-source-rollback">Virtual Source Rollback</a></li>
+  <li><a href="/References/Workflows.html#virtual-source-enable">Virtual Source Enable</a></li>
+</ul>
+
+<h3 id="signature-13">Signature</h3>
+
+<p><code class="highlighter-rouge">def reconfigure(virtual_source, repository, source_config, snapshot)</code></p>
+
+<h3 id="decorator-13">Decorator</h3>
+
+<p><code class="highlighter-rouge">virtual.reconfigure()</code></p>
+
+<h3 id="arguments-13">Arguments</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>virtual_source</td>
+      <td><a href="/References/Classes.html#virtualsource">VirtualSource</a></td>
+      <td>The source associated with this operation.</td>
+    </tr>
+    <tr>
+      <td>snapshot</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#snapshotdefinition-class">SnapshotDefinition</a></td>
+      <td>The snapshot of the data set to configure.</td>
+    </tr>
+    <tr>
+      <td>repository</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#repositorydefinition-class">RepositoryDefinition</a></td>
+      <td>The repository associated with this source.</td>
+    </tr>
+    <tr>
+      <td>source_config</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#sourceconfigdefinition-class">SourceConfigDefinition</a></td>
+      <td>The source config associated with this source.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="returns-13">Returns</h3>
+<p><a href="/References/Schemas_and_Autogenerated_Classes.html#sourceconfigdefinition-class">SourceConfigDefinition</a></p>
+
+<h3 id="example-12">Example</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+<span class="kn">from</span> <span class="nn">generated.definitions</span> <span class="kn">import</span> <span class="n">SourceConfigDefinition</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.virtual.reconfigure</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="n">virtual_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">source_config</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">):</span>
+  <span class="n">name</span> <span class="o">=</span> <span class="s">"updated_config_name"</span>
+  <span class="n">source_config</span> <span class="o">=</span> <span class="n">SourceConfigDefinition</span><span class="p">()</span>
+  <span class="n">source_config</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+  <span class="k">return</span> <span class="n">source_config</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>The above command assumes a <a href="/References/Schemas_and_Autogenerated_Classes.html#sourceconfig-schema">SourceConfig Schema</a> defined as:</p>
+</blockquote>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"required"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span><span class="w">
+  </span><span class="s2">"additionalProperties"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w"> </span><span class="p">}</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="s2">"identityFields"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span><span class="w">
+  </span><span class="s2">"nameField"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"name"</span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="virtual-source-start">Virtual Source Start</h2>
+
+<p>Executed whenever the data should be placed in a “running” state.</p>
+
+<h3 id="required--optional-14">Required / Optional</h3>
+<p><strong>Optional.</strong></p>
+
+<h3 id="delphix-engine-operations-14">Delphix Engine Operations</h3>
+
+<ul>
+  <li><a href="/References/Workflows.html#virtual-source-start">Virtual Source Start</a></li>
+</ul>
+
+<h3 id="signature-14">Signature</h3>
+
+<p><code class="highlighter-rouge">def start(virtual_source, repository, source_config)</code></p>
+
+<h3 id="decorator-14">Decorator</h3>
+
+<p><code class="highlighter-rouge">virtual.start()</code></p>
+
+<h3 id="arguments-14">Arguments</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>virtual_source</td>
+      <td><a href="/References/Classes.html#virtualsource">VirtualSource</a></td>
+      <td>The source associated with this operation.</td>
+    </tr>
+    <tr>
+      <td>repository</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#repositorydefinition-class">RepositoryDefinition</a></td>
+      <td>The repository associated with this source.</td>
+    </tr>
+    <tr>
+      <td>source_config</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#sourceconfigdefinition-class">SourceConfigDefinition</a></td>
+      <td>The source config associated with this source.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="returns-14">Returns</h3>
+<p>None</p>
+
+<h3 id="example-13">Example</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.virtual.start</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="n">virtual_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">source_config</span><span class="p">):</span>
+  <span class="k">pass</span>
+</code></pre></div></div>
+
+<h2 id="virtual-source-stop">Virtual Source Stop</h2>
+
+<p>Executed whenever the data needs to be shut down.
+Required to implement for Delphix Engine operations:</p>
+
+<h3 id="required--optional-15">Required / Optional</h3>
+<p><strong>Optional.</strong></p>
+
+<h3 id="delphix-engine-operations-15">Delphix Engine Operations</h3>
+
+<ul>
+  <li><a href="/References/Workflows.html#virtual-source-stop">Virtual Source Stop</a></li>
+</ul>
+
+<h3 id="signature-15">Signature</h3>
+
+<p><code class="highlighter-rouge">def stop(virtual_source, repository, source_config)</code></p>
+
+<h3 id="decorator-15">Decorator</h3>
+
+<p><code class="highlighter-rouge">virtual.stop()</code></p>
+
+<h3 id="arguments-15">Arguments</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>virtual_source</td>
+      <td><a href="/References/Classes.html#virtualsource">VirtualSource</a></td>
+      <td>The source associated with this operation.</td>
+    </tr>
+    <tr>
+      <td>repository</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#repositorydefinition-class">RepositoryDefinition</a></td>
+      <td>The repository associated with this source.</td>
+    </tr>
+    <tr>
+      <td>source_config</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#sourceconfigdefinition-class">SourceConfigDefinition</a></td>
+      <td>The source config associated with this source.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="returns-15">Returns</h3>
+<p>None</p>
+
+<h3 id="example-14">Example</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.virtual.stop</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="n">virtual_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">source_config</span><span class="p">):</span>
+  <span class="k">pass</span>
+</code></pre></div></div>
+
+<h2 id="virtual-source-pre-snapshot">Virtual Source Pre-Snapshot</h2>
+
+<p>Prepares the virtual source for taking a snapshot of the data.</p>
+
+<h3 id="required--optional-16">Required / Optional</h3>
+<p><strong>Optional.</strong></p>
+
+<h3 id="delphix-engine-operations-16">Delphix Engine Operations</h3>
+
+<ul>
+  <li><a href="/References/Workflows.html#virtual-source-snapshot">Virtual Source Snapshot</a></li>
+</ul>
+
+<h3 id="signature-16">Signature</h3>
+
+<p><code class="highlighter-rouge">def virtual_pre_snapshot(virtual_source, repository, source_config)</code></p>
+
+<h3 id="decorator-16">Decorator</h3>
+
+<p><code class="highlighter-rouge">virtual.pre_snapshot()</code></p>
+
+<h3 id="arguments-16">Arguments</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>virtual_source</td>
+      <td><a href="/References/Classes.html#virtualsource">VirtualSource</a></td>
+      <td>The source associated with this operation.</td>
+    </tr>
+    <tr>
+      <td>repository</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#repositorydefinition-class">RepositoryDefinition</a></td>
+      <td>The repository associated with this source.</td>
+    </tr>
+    <tr>
+      <td>source_config</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#sourceconfigdefinition-class">SourceConfigDefinition</a></td>
+      <td>The source config associated with this source.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="returns-16">Returns</h3>
+<p>None</p>
+
+<h3 id="example-15">Example</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.virtual.pre_snapshot</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">virtual_pre_snapshot</span><span class="p">(</span><span class="n">virtual_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">source_config</span><span class="p">):</span>
+  <span class="k">pass</span>
+</code></pre></div></div>
+
+<h2 id="virtual-source-post-snapshot">Virtual Source Post-Snapshot</h2>
+
+<p>Captures metadata after a snapshot.</p>
+
+<h3 id="required--optional-17">Required / Optional</h3>
+<p><strong>Required.</strong></p>
+
+<h3 id="delphix-engine-operations-17">Delphix Engine Operations</h3>
+
+<ul>
+  <li><a href="/References/Workflows.html#virtual-source-snapshot">Virtual Source Snapshot</a></li>
+</ul>
+
+<h3 id="signature-17">Signature</h3>
+
+<p><code class="highlighter-rouge">def virtual_post_snapshot(virtual_source, repository, source_config)</code></p>
+
+<h3 id="decorator-17">Decorator</h3>
+
+<p><code class="highlighter-rouge">virtual.post_snapshot()</code></p>
+
+<h3 id="arguments-17">Arguments</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>virtual_source</td>
+      <td><a href="/References/Classes.html#virtualsource">VirtualSource</a></td>
+      <td>The source associated with this operation.</td>
+    </tr>
+    <tr>
+      <td>repository</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#repositorydefinition-class">RepositoryDefinition</a></td>
+      <td>The repository associated with this source.</td>
+    </tr>
+    <tr>
+      <td>source_config</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#sourceconfigdefinition-class">SourceConfigDefinition</a></td>
+      <td>The source config associated with this source.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="returns-17">Returns</h3>
+<p><a href="/References/Schemas_and_Autogenerated_Classes.html#snapshotdefinition-class">SnapshotDefinition</a></p>
+
+<h3 id="example-16">Example</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+<span class="kn">from</span> <span class="nn">generated.defintions</span> <span class="kn">import</span> <span class="n">SnapshotDefinition</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.virtual.post_snapshot</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">virtual_post_snapshot</span><span class="p">(</span><span class="n">virtual_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">source_config</span><span class="p">):</span>
+  <span class="n">snapshot</span> <span class="o">=</span> <span class="n">SnapshotDefinition</span><span class="p">()</span>
+  <span class="n">snapshot</span><span class="o">.</span><span class="n">transaction_id</span> <span class="o">=</span> <span class="mi">1000</span>
+  <span class="k">return</span> <span class="n">snapshot</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>The above command assumes a <a href="/References/Schemas_and_Autogenerated_Classes.html#snapshot-schema">Snapshot Schema</a> defined as:</p>
+</blockquote>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"additionalProperties"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"transactionId"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w"> </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="virtual-source-mount-specification">Virtual Source Mount Specification</h2>
+
+<p>Returns configurations for the mounts associated for data in virtual source.
+The <code class="highlighter-rouge">ownership_specification</code> is optional. If not specified, the platform will default the ownership settings to the environment user used for the Delphix Operation.</p>
+
+<h3 id="required--optional-18">Required / Optional</h3>
+<p><strong>Required.</strong></p>
+
+<h3 id="delphix-engine-operations-18">Delphix Engine Operations</h3>
+
+<ul>
+  <li><a href="/References/Workflows.html#virtual-source-enable">Virtual Source Enable</a></li>
+  <li><a href="/References/Workflows.html#virtual-source-provision">Virtual Source Provision</a></li>
+  <li><a href="/References/Workflows.html#virtual-source-refresh">Virtual Source Refresh</a></li>
+  <li><a href="/References/Workflows.html#virtual-source-rollback">Virtual Source Rollback</a></li>
+  <li><a href="/References/Workflows.html#virtual-source-start">Virtual Source Start</a></li>
+</ul>
+
+<h3 id="signature-18">Signature</h3>
+
+<p><code class="highlighter-rouge">def virtual_mount_specification(virtual_source, repository)</code></p>
+
+<h3 id="decorator-18">Decorator</h3>
+
+<p><code class="highlighter-rouge">virtual.mount_specification()</code></p>
+
+<h3 id="arguments-18">Arguments</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>virtual_source</td>
+      <td><a href="/References/Classes.html#virtualsource">VirtualSource</a></td>
+      <td>The source associated with this operation.</td>
+    </tr>
+    <tr>
+      <td>repository</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#repositorydefinition-class">RepositoryDefinition</a></td>
+      <td>The repository associated with this source.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="returns-18">Returns</h3>
+<p><a href="/References/Classes.html#mountspecification">MountSpecification</a></p>
+
+<h3 id="example-17">Example</h3>
+
+<p>!!! info
+    <code class="highlighter-rouge">ownership_specification</code> only applies to Unix hosts.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+<span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Mount</span>
+<span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">MountSpecification</span>
+<span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">OwenershipSpecification</span>
+<span class="kn">from</span> <span class="nn">generated.definitions</span> <span class="kn">import</span> <span class="n">SnapshotDefinition</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.virtual.mount_specification</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">virtual_mount_specification</span><span class="p">(</span><span class="n">virtual_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">):</span>
+  <span class="n">mount</span> <span class="o">=</span> <span class="n">Mount</span><span class="p">(</span><span class="n">virtual_source</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">environment</span><span class="p">,</span> <span class="s">"/some/path"</span><span class="p">)</span>
+  <span class="n">ownership_spec</span> <span class="o">=</span> <span class="n">OwenershipSpecification</span><span class="p">(</span><span class="n">repository</span><span class="o">.</span><span class="n">uid</span><span class="p">,</span> <span class="n">repository</span><span class="o">.</span><span class="n">gid</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="n">MountSpecification</span><span class="p">([</span><span class="n">mount</span><span class="p">],</span> <span class="n">ownership_spec</span><span class="p">)</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>The above command assumes a <a href="/References/Schemas_and_Autogenerated_Classes.html#repository-schema">Repository Schema</a> defined as:</p>
+</blockquote>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"additionalProperties"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"uid"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"integer"</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"gid"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"integer"</span><span class="w"> </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="virtual-source-status">Virtual Source Status</h2>
+
+<p>Determines the status of a <a href="/References/Glossary.html#virtual-source">Virtual Source</a> to show end users whether it is healthy or not.</p>
+
+<h3 id="required--optional-19">Required / Optional</h3>
+<p><strong>Optional.</strong><br />
+If not implemented, the platform assumes that the status is <code class="highlighter-rouge">Status.ACTIVE</code>.</p>
+
+<h3 id="delphix-engine-operations-19">Delphix Engine Operations</h3>
+
+<ul>
+  <li><a href="/References/Workflows.html#virtual-source-enable">Virtual Source Enable</a></li>
+</ul>
+
+<h3 id="signature-19">Signature</h3>
+
+<p><code class="highlighter-rouge">def virtual_status(virtual_source, repository, source_config)</code></p>
+
+<h3 id="decorator-19">Decorator</h3>
+
+<p><code class="highlighter-rouge">virtual.status()</code></p>
+
+<h3 id="arguments-19">Arguments</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>virtual_source</td>
+      <td><a href="/References/Classes.html#virtualsource">VirtualSource</a></td>
+      <td>The source associated with this operation.</td>
+    </tr>
+    <tr>
+      <td>repository</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#repositorydefinition-class">RepositoryDefinition</a></td>
+      <td>The repository associated with this source.</td>
+    </tr>
+    <tr>
+      <td>source_config</td>
+      <td><a href="/References/Schemas_and_Autogenerated_Classes.html#sourceconfigdefinition-class">SourceConfigDefinition</a></td>
+      <td>The source config associated with this source.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="returns-19">Returns</h3>
+<p><a href="/References/Classes.html#status">Status</a><br />
+<code class="highlighter-rouge">Status.ACTIVE</code> if the plugin operation is not implemented.</p>
+
+<h3 id="example-18">Example</h3>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+<span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Status</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.virtual.status</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">virtual_status</span><span class="p">(</span><span class="n">virtual_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">source_config</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">Status</span><span class="o">.</span><span class="n">ACTIVE</span>
+</code></pre></div></div>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+    
+  </body>
+</html>

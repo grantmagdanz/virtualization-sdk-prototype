@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Code Sharing | virtualization-sdk</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Code Sharing" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/Best_Practices/Code_Sharing.html" />
+<meta property="og:url" content="http://localhost:4000/Best_Practices/Code_Sharing.html" />
+<meta property="og:site_name" content="virtualization-sdk" />
+<script type="application/ld+json">
+{"@type":"WebPage","url":"http://localhost:4000/Best_Practices/Code_Sharing.html","headline":"Code Sharing","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=52f3c2ef1003e9fe35bc8813a5d4baa843da74c1">
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="http://localhost:4000/">virtualization-sdk</a></h1>
+      
+
+      <h1 id="code-sharing">Code Sharing</h1>
+
+<p>All Python modules inside of <code class="highlighter-rouge">srcDir</code> can be imported just as they would be if the plugin was executing locally. When a plugin operation is executed <code class="highlighter-rouge">srcDir</code> is the current working directory so all imports need to be relative to <code class="highlighter-rouge">srcDir</code> regardless of the path of the module doing the import.</p>
+
+<p>Please refer to Python’s <a href="https://docs.python.org/2/tutorial/modules.html#modules">documentation on modules</a> to learn more about modules and imports.</p>
+
+<h2 id="example">Example</h2>
+
+<p>Assume we have the following file structure:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>postgres
+├── plugin_config.yml
+├── schema.json
+└── src
+    ├── operations
+    │   ├── __init__.py
+    │   └── discovery.py
+    ├── plugin_runner.py
+    ├── resources
+    │   ├── __init__.py
+    │   ├── execute_sql.sh
+    │   ├── list_installs.sh
+    │   └── list_schemas.sql
+    └── utils
+        ├── __init__.py
+        └── execution_util.py
+</code></pre></div></div>
+
+<p>Any module in the plugin could import <code class="highlighter-rouge">execution_util.py</code> with <code class="highlighter-rouge">from utils import execution_util</code>.</p>
+
+<p>!!! warning “Gotcha”
+	Since the platform uses Python 2.7, every directory needs to have an <code class="highlighter-rouge">__init__.py</code> file in it otherwise the modules and resources in the folder will not be found at runtime. For more information on <code class="highlighter-rouge">__init__.py</code> files refer to Python’s <a href="https://docs.python.org/2/tutorial/modules.html#packages">documentation on packages</a>.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Note that the `srcDir` in the plugin config file (`src` in this example) does _not_ need an `__init__.py` file.
+</code></pre></div></div>
+
+<p>Assume <code class="highlighter-rouge">schema.json</code> contains:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+    "repositoryDefinition": {
+        "type": "object",
+        "properties": {
+            "name": { "type": "string" }
+        },
+        "nameField": "name",
+        "identityFields": ["name"]
+    },
+    "sourceConfigDefinition": {
+        "type": "object",
+        "required": ["name"],
+        "additionalProperties": false,
+        "properties": {
+            "name": { "type": "string" }
+        },
+        "nameField": "name",
+        "identityFields": ["name"]
+    }
+}
+</code></pre></div></div>
+
+<p>To keep the code cleaner, this plugin does two things:</p>
+
+<ol>
+  <li>Splits discovery logic into its own module: <code class="highlighter-rouge">discovery.py</code>.</li>
+  <li>Uses two helper funtions <code class="highlighter-rouge">execute_sql</code> and <code class="highlighter-rouge">execute_shell</code> in <code class="highlighter-rouge">utils/execution_util.py</code> to abstract all remote execution.</li>
+</ol>
+
+<h3 id="plugin_runnerpy">plugin_runner.py</h3>
+
+<p>When the platform needs to execute a plugin operation, it always calls into the function decorated by the <code class="highlighter-rouge">entryPoint</code> object. The rest of the control flow is determined by the plugin. In order to split logic, the decorated function must delegate into the appropriate module. Below is an example of <code class="highlighter-rouge">plugin_runner.py</code> delegating into <code class="highlighter-rouge">discovery.py</code> to handle repository and source config discovery:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">operations</span> <span class="kn">import</span> <span class="n">discovery</span>
+
+<span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+
+<span class="nd">@plugin.discovery.repository</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">repository_discovery</span><span class="p">(</span><span class="n">source_connection</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">discovery</span><span class="o">.</span><span class="n">find_installs</span><span class="p">(</span><span class="n">source_connection</span><span class="p">);</span>
+
+
+<span class="nd">@plugin.discovery.source_config</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">source_config_discovery</span><span class="p">(</span><span class="n">source_connection</span><span class="p">,</span> <span class="n">repository</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">discovery</span><span class="o">.</span><span class="n">find_schemas</span><span class="p">(</span><span class="n">source_connection</span><span class="p">,</span> <span class="n">repository</span><span class="p">)</span>
+
+
+</code></pre></div></div>
+<p>!!! note
+	<code class="highlighter-rouge">discovery.py</code> is in the <code class="highlighter-rouge">operations</code> package so it is imported with <code class="highlighter-rouge">from operations import discovery</code>.</p>
+
+<h3 id="discoverypy">discovery.py</h3>
+<p>In <code class="highlighter-rouge">discovery.py</code> the plugin delegates even further to split business logic away from remote execution. <code class="highlighter-rouge">utils/execution_util.py</code> deals with remote execution and error handling so <code class="highlighter-rouge">discovery.py</code> can focus on business logic. Note that <code class="highlighter-rouge">discovery.py</code> still needs to know the format of the return value from each script.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization</span> <span class="kn">import</span> <span class="n">libs</span>
+
+<span class="kn">from</span> <span class="nn">generated.definitions</span> <span class="kn">import</span> <span class="n">RepositoryDefinition</span><span class="p">,</span> <span class="n">SourceConfigDefinition</span>
+<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">execution_util</span>
+
+
+<span class="k">def</span> <span class="nf">find_installs</span><span class="p">(</span><span class="n">source_connection</span><span class="p">):</span>
+    <span class="n">installs</span> <span class="o">=</span> <span class="n">execution_util</span><span class="o">.</span><span class="n">execute_shell</span><span class="p">(</span><span class="n">source_connection</span><span class="p">,</span> <span class="s">'list_installs.sh'</span><span class="p">)</span>
+
+    <span class="c"># Assume 'installs' is a comma separated list of the names of Postgres installations.</span>
+    <span class="n">install_names</span> <span class="o">=</span> <span class="n">installs</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">','</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">RepositoryDefinition</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">install_names</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">find_schemas</span><span class="p">(</span><span class="n">source_connection</span><span class="p">,</span> <span class="n">repository</span><span class="p">):</span>
+    <span class="n">schemas</span> <span class="o">=</span> <span class="n">execution_util</span><span class="o">.</span><span class="n">execute_sql</span><span class="p">(</span><span class="n">source_connection</span><span class="p">,</span> <span class="n">repository</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s">'list_schemas.sql'</span><span class="p">)</span>
+
+    <span class="c"># Assume 'schemas' is a comma separated list of the schema names.</span>
+    <span class="n">schema_names</span> <span class="o">=</span> <span class="n">schemas</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">','</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">SourceConfigDefinition</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">schema_names</span><span class="p">]</span>
+</code></pre></div></div>
+<p>!!! note
+	Even though <code class="highlighter-rouge">discovery.py</code> is in the <code class="highlighter-rouge">operations</code> package, the import for <code class="highlighter-rouge">execution_util</code> is still relative to the <code class="highlighter-rouge">srcDir</code> specified in the plugin config file. <code class="highlighter-rouge">execution_util</code> is in the <code class="highlighter-rouge">utils</code> package so it is imported with <code class="highlighter-rouge">from utils import execution_util</code>.</p>
+
+<h3 id="execution_utilpy">execution_util.py</h3>
+
+<p><code class="highlighter-rouge">execution_util.py </code> has two methods <code class="highlighter-rouge">execute_sql</code> and <code class="highlighter-rouge">execute_shell</code>. <code class="highlighter-rouge">execute_sql</code> takes the name of a SQL script in <code class="highlighter-rouge">resources/</code> and executes it with <code class="highlighter-rouge">resources/execute_sql.sh</code>. <code class="highlighter-rouge">execute_shell</code> takes the name of a shell script in <code class="highlighter-rouge">resources/</code> and executes it.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pkgutil</span>
+
+<span class="kn">from</span> <span class="nn">dlpx.virtualization</span> <span class="kn">import</span> <span class="n">libs</span>
+
+
+<span class="k">def</span> <span class="nf">execute_sql</span><span class="p">(</span><span class="n">source_connection</span><span class="p">,</span> <span class="n">install_name</span><span class="p">,</span> <span class="n">script_name</span><span class="p">):</span>
+    <span class="n">psql_script</span> <span class="o">=</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="s">"resources"</span><span class="p">,</span> <span class="s">"execute_sql.sh"</span><span class="p">)</span>
+    <span class="n">sql_script</span> <span class="o">=</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="s">"resources"</span><span class="p">,</span> <span class="n">script_name</span><span class="p">)</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">libs</span><span class="o">.</span><span class="n">run_bash</span><span class="p">(</span>
+        <span class="n">source_connection</span><span class="p">,</span> <span class="n">psql_script</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s">"SCRIPT"</span><span class="p">:</span> <span class="n">sql_script</span><span class="p">},</span> <span class="n">check</span><span class="o">=</span><span class="bp">True</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">stdout</span>
+
+
+<span class="k">def</span> <span class="nf">execute_shell</span><span class="p">(</span><span class="n">source_connection</span><span class="p">,</span> <span class="n">script_name</span><span class="p">):</span>
+    <span class="n">script</span> <span class="o">=</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="s">"resources"</span><span class="p">,</span> <span class="n">script_name</span><span class="p">)</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">libs</span><span class="o">.</span><span class="n">run_bash</span><span class="p">(</span><span class="n">source_connection</span><span class="p">,</span> <span class="n">script</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">stdout</span>
+</code></pre></div></div>
+
+<p>!!! note
+	Both <code class="highlighter-rouge">execute_sql</code> and <code class="highlighter-rouge">execute_shell</code> use the <code class="highlighter-rouge">check</code> parameter which will cause an error to be raised if the exit code is non-zero. For more information refer to the <code class="highlighter-rouge">run_bash</code> <a href="/References/Platform_Libraries.md#run_bash">documentation</a>.</p>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+    
+  </body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Logging | virtualization-sdk</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Logging" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/References/Logging.html" />
+<meta property="og:url" content="http://localhost:4000/References/Logging.html" />
+<meta property="og:site_name" content="virtualization-sdk" />
+<script type="application/ld+json">
+{"@type":"WebPage","url":"http://localhost:4000/References/Logging.html","headline":"Logging","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=52f3c2ef1003e9fe35bc8813a5d4baa843da74c1">
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="http://localhost:4000/">virtualization-sdk</a></h1>
+      
+
+      <h1 id="logging">Logging</h1>
+
+<h2 id="what-is-logging">What is logging?</h2>
+
+<p>The Virtualization Platform keeps plugin-specific log files. A plugin can, at any point in any of its <a href="/References/Glossary.html#plugin-operation">plugin operations</a>, write out some text to its log file(s). These log files can be examined later, typically to try to debug a problem with the plugin.</p>
+
+<h2 id="overview">Overview</h2>
+
+<p>The Virtualization Platform integrates with Python’s built-in <a href="https://docs.python.org/2/library/logging.html">logging framework</a>. A special <a href="https://docs.python.org/2/library/logging.html#handler-objects">Handler</a> is exposed by the platform at <code class="highlighter-rouge">dlpx.virtualization.libs.PlatformHandler</code>. This handler needs to be added to the Python logger your plugin creates. Logging statements made through Python’s logging framework will then be routed to the platform.</p>
+
+<h2 id="basic-setup">Basic Setup</h2>
+<p>Below is the absolute minimum needed to setup logging for the platform. Please refer to Python’s <a href="https://docs.python.org/2/library/logging.html">logging documentation</a> and the <a href="#customized-example">example below</a> to better understand how it can be customized.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">dlpx.virtualization.libs</span> <span class="kn">import</span> <span class="n">PlatformHandler</span>
+
+<span class="c"># Get the root logger.</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">PlatformHandler</span><span class="p">())</span>
+
+<span class="c"># The root logger's default level is logging.WARNING.</span>
+<span class="c"># Without the line below, logging statements of levels</span>
+<span class="c"># lower than logging.WARNING will be suppressed.</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>!!! note “Logging Setup”
+	Python’s logging framework is global. Setup only needs to happen once, but where it happens is important. Any logging statements that occur before the <code class="highlighter-rouge">PlatformHandler</code> is added will not be logged by the platform.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>It is highly recommended that the logging setup is done in the plugin's entry point module before any operations are ran.
+</code></pre></div></div>
+
+<p>!!! warning “Add the PlatformHandler to the root logger”
+	Loggers in Python have a hierarchy and all loggers are children of a special logger called the “root logger”. Logging hierarchy is not always intuitive and depends on how modules are structured.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>To avoid this complexity, add the `PlatformHandler` to the root logger. The root logger can be retrieved with `logging.getLogger()`.
+</code></pre></div></div>
+
+<h2 id="usage">Usage</h2>
+<p>Once the <code class="highlighter-rouge">PlatformHandler</code> has been added to the logger, logging is done with Python’s <a href="https://docs.python.org/2/library/logging.html#logger-objects">Logger</a> object. Below is a simple example including the basic setup code used above:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">dlpx.virtualization.libs</span> <span class="kn">import</span> <span class="n">PlatformHandler</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">PlatformHandler</span><span class="p">())</span>
+
+<span class="c"># The root logger's default level is logging.WARNING.</span>
+<span class="c"># Without the line below, logging statements of levels</span>
+<span class="c"># lower than logging.WARNING will be suppressed.</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+<span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">'debug'</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">'info'</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">'error'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h3 id="example">Example</h3>
+<p>Imagine you notice that your plugin is taking a very long time to do discovery. Everything works, it just takes much longer than expected. You’d like to figure out why.</p>
+
+<p>!!! info
+    Refer to <a href="/Best_Practices/Managing_Scripts_For_Remote_Execution.md">Managing Scripts for Remote Execution</a> for how remote scripts can be stored and retrieved.</p>
+
+<p>Suppose your plugin has a source config discovery operation that looks like this (code is abbreviated to be easier to follow):</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pkgutil</span>
+
+<span class="kn">from</span> <span class="nn">dlpx.virtualization</span> <span class="kn">import</span> <span class="n">libs</span>
+<span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.discovery.repository</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">repository_discovery</span><span class="p">(</span><span class="n">source_connection</span><span class="p">):</span> 
+  <span class="k">return</span> <span class="p">[</span><span class="n">RepositoryDefinition</span><span class="p">(</span><span class="s">'Logging Example'</span><span class="p">)]</span>
+
+
+<span class="nd">@plugin.discovery.source_config</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">source_config_discovery</span><span class="p">(</span><span class="n">source_connection</span><span class="p">,</span> <span class="n">repository</span><span class="p">):</span>
+  <span class="n">version_result</span> <span class="o">=</span> <span class="n">libs</span><span class="o">.</span><span class="n">run_bash</span><span class="p">(</span><span class="n">source_connection</span><span class="p">,</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="s">'resources'</span><span class="p">,</span> <span class="s">'get_db_version.sh'</span><span class="p">))</span>
+  <span class="n">users_result</span> <span class="o">=</span> <span class="n">libs</span><span class="o">.</span><span class="n">run_bash</span><span class="p">(</span><span class="n">source_connection</span><span class="p">,</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="s">'resources'</span><span class="p">,</span> <span class="s">'get_db_users.sh'</span><span class="p">))</span>
+  <span class="n">db_results</span> <span class="o">=</span> <span class="n">libs</span><span class="o">.</span><span class="n">run_bash</span><span class="p">(</span><span class="n">source_connection</span><span class="p">,</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="s">'resources'</span><span class="p">,</span> <span class="s">'get_databases.sh'</span><span class="p">))</span>
+  <span class="n">status_result</span> <span class="o">=</span> <span class="n">libs</span><span class="o">.</span><span class="n">run_bash</span><span class="p">(</span><span class="n">source_connection</span><span class="p">,</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="s">'resources'</span><span class="p">,</span> <span class="s">'get_database_statuses.sh'</span><span class="p">))</span>
+
+  <span class="c"># Return an empty list for simplicity. In reality</span>
+  <span class="c"># something would be done with the results above.</span>
+  <span class="k">return</span> <span class="p">[]</span>
+ 
+</code></pre></div></div>
+
+<p>Now, imagine that you notice that it’s taking a long time to do discovery, and you’d like to try to figure out why. One thing that might help is to add logging, like this:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">pkgutil</span>
+
+<span class="kn">from</span> <span class="nn">dlpx.virtualization</span> <span class="kn">import</span> <span class="n">libs</span>
+<span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+
+<span class="kn">from</span> <span class="nn">generated.definitions</span> <span class="kn">import</span> <span class="n">RepositoryDefinition</span>
+
+<span class="c"># This should probably be defined in its own module outside</span>
+<span class="c"># of the plugin's entry point file. It is here for simplicity.</span>
+<span class="k">def</span> <span class="nf">_setup_logger</span><span class="p">():</span>
+	<span class="c"># This will log the time, level, filename, line number, and log message.</span>
+    <span class="n">log_message_format</span> <span class="o">=</span> <span class="s">'[</span><span class="si">%(asctime)</span><span class="s">s] [</span><span class="si">%(levelname)</span><span class="s">s] [</span><span class="si">%(filename)</span><span class="s">s:</span><span class="si">%(lineno)</span><span class="s">d] </span><span class="si">%(message)</span><span class="s">s'</span>
+	<span class="n">log_message_date_format</span> <span class="o">=</span> <span class="s">'</span><span class="si">%</span><span class="s">Y-</span><span class="si">%</span><span class="s">m-</span><span class="si">%</span><span class="s">d </span><span class="si">%</span><span class="s">H:</span><span class="si">%</span><span class="s">M:</span><span class="si">%</span><span class="s">S'</span>
+
+	<span class="c"># Create a custom formatter. This will help with diagnosability.</span>
+	<span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">log_message_format</span><span class="p">,</span> <span class="n">datefmt</span><span class="o">=</span> <span class="n">log_message_date_format</span><span class="p">)</span>
+
+	<span class="n">platform_handler</span> <span class="o">=</span> <span class="n">libs</span><span class="o">.</span><span class="n">PlatformHandler</span><span class="p">()</span>
+	<span class="n">platform_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+
+	<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+	<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">platform_handler</span><span class="p">)</span>
+
+	<span class="c"># By default the root logger's level is logging.WARNING.</span>
+	<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+
+<span class="c"># Setup the logger.</span>
+<span class="n">_setup_logger</span><span class="p">()</span>
+
+<span class="c"># logging.getLogger(__name__) is the convention way to get a logger in Python.</span>
+<span class="c"># It returns a new logger per module and will be a child of the root logger.</span>
+<span class="c"># Since we setup the root logger, nothing else needs to be done to set this</span>
+<span class="c"># one up.</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.discovery.repository</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">repository_discovery</span><span class="p">(</span><span class="n">source_connection</span><span class="p">):</span> 
+  <span class="k">return</span> <span class="p">[</span><span class="n">RepositoryDefinition</span><span class="p">(</span><span class="s">'Logging Example'</span><span class="p">)]</span>
+
+<span class="nd">@plugin.discovery.source_config</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">source_config_discovery</span><span class="p">(</span><span class="n">source_connection</span><span class="p">,</span> <span class="n">repository</span><span class="p">):</span>
+  <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">'About to get DB version'</span><span class="p">)</span>
+  <span class="n">version_result</span> <span class="o">=</span> <span class="n">libs</span><span class="o">.</span><span class="n">run_bash</span><span class="p">(</span><span class="n">source_connection</span><span class="p">,</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="s">'resources'</span><span class="p">,</span> <span class="s">'get_db_version.sh'</span><span class="p">))</span>
+  <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">'About to get DB users'</span><span class="p">)</span>
+  <span class="n">users_result</span> <span class="o">=</span> <span class="n">libs</span><span class="o">.</span><span class="n">run_bash</span><span class="p">(</span><span class="n">source_connection</span><span class="p">,</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="s">'resources'</span><span class="p">,</span> <span class="s">'get_db_users.sh'</span><span class="p">))</span>
+  <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">'About to get databases'</span><span class="p">)</span>
+  <span class="n">db_results</span> <span class="o">=</span> <span class="n">libs</span><span class="o">.</span><span class="n">run_bash</span><span class="p">(</span><span class="n">source_connection</span><span class="p">,</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="s">'resources'</span><span class="p">,</span> <span class="s">'get_databases.sh'</span><span class="p">))</span>
+  <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">'About to get DB statuses'</span><span class="p">)</span>
+  <span class="n">status_result</span> <span class="o">=</span> <span class="n">libs</span><span class="o">.</span><span class="n">run_bash</span><span class="p">(</span><span class="n">source_connection</span><span class="p">,</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="s">'resources'</span><span class="p">,</span> <span class="s">'get_database_statuses.sh'</span><span class="p">))</span>
+  <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">'Done collecting data'</span><span class="p">)</span>
+  
+  <span class="c"># Return an empty list for simplicity. In reality</span>
+  <span class="c"># something would be done with the results above.</span>
+  <span class="k">return</span> <span class="p">[]</span>
+</code></pre></div></div>
+
+<p>When you look at the log file, perhaps you’ll see something like this:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[Worker-360|JOB-315|ENVIRONMENT_DISCOVER(UNIX_HOST_ENVIRONMENT-5)] [2019-04-30 12:10:42] [DEBUG] [python_runner.py:44] About to get DB version
+[Worker-360|JOB-316|DB_SYNC(APPDATA_CONTAINER-21)] [2019-04-30 12:19:35] [DEBUG] [python_runner.py:49] About to get DB users
+[Worker-325|JOB-280|ENVIRONMENT_REFRESH(UNIX_HOST_ENVIRONMENT-5)] [DEBUG] [plugin_runner.py:51] About to get databases
+[Worker-326|JOB-281|SOURCES_DISABLE(UNIX_HOST_ENVIRONMENT-5)] [DEBUG] [plugin_runner.py:53] About to get DB statuses
+</code></pre></div></div>
+
+<p>You can see that it only takes a few seconds for us do each of our data collection steps, with the exception of getting the users, which takes over 13 minutes!</p>
+
+<p>We now know that our slowdown is something to do with how our bash script is collecting all the users. Logging has gotten us a lot closer to figuring out the problem.</p>
+
+<h2 id="how-to-retrieve-logs">How to retrieve logs</h2>
+
+<p>Download a support bundle by going to <strong>Help</strong> &gt; <strong>Support Logs</strong>  and select <strong>Download</strong>. The logs will be in a the support bundle under <code class="highlighter-rouge">log/mgmt_log/plugin_log/&lt;plugin name&gt;</code>.</p>
+
+<h2 id="logging-levels">Logging Levels</h2>
+
+<p>Python has a number of <a href="https://docs.python.org/2/library/logging.html#logging-levels">preset logging levels</a> and allows for custom ones as well. Since logging on the Virtualization Platform uses the <code class="highlighter-rouge">logging</code> framework, log statements of all levels are supported.</p>
+
+<p>However, the Virtualization Platform will map all logging levels into three files: <code class="highlighter-rouge">debug.log</code>, <code class="highlighter-rouge">info.log</code>, and <code class="highlighter-rouge">error.log</code> in the following way:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">Python Logging Level</th>
+      <th style="text-align: center">Logging File</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">DEBUG</td>
+      <td style="text-align: center">debug.log</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">INFO</td>
+      <td style="text-align: center">info.log</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">WARN</td>
+      <td style="text-align: center">error.log</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">WARNING</td>
+      <td style="text-align: center">error.log</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">ERROR</td>
+      <td style="text-align: center">error.log</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">CRITICAL</td>
+      <td style="text-align: center">error.log</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>As is the case with the <code class="highlighter-rouge">logging</code> framework, logging statements are hierarchical: logging statements made at the <code class="highlighter-rouge">logging.DEBUG</code> level will be written only to <code class="highlighter-rouge">debug.log</code> while logging statements made at the <code class="highlighter-rouge">logging.ERROR</code> level will be written to <code class="highlighter-rouge">debug.log</code>, <code class="highlighter-rouge">info.log</code>, and <code class="highlighter-rouge">error.log</code>.</p>
+
+<h2 id="sensitive-data">Sensitive data</h2>
+
+<p>Remember that logging data means writing that data out in cleartext. Make sure you never log any data that could be secret or sensitive (passwords, etc.). For more details please see our section on <a href="/Best_Practices/Sensitive_Data.md">sensitive data</a></p>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+    
+  </body>
+</html>

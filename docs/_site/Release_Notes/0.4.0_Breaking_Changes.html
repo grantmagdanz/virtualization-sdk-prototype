@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Breaking Changes - Early Preview 2 (v.0.4.0) | virtualization-sdk</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Breaking Changes - Early Preview 2 (v.0.4.0)" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/Release_Notes/0.4.0_Breaking_Changes.html" />
+<meta property="og:url" content="http://localhost:4000/Release_Notes/0.4.0_Breaking_Changes.html" />
+<meta property="og:site_name" content="virtualization-sdk" />
+<script type="application/ld+json">
+{"@type":"WebPage","url":"http://localhost:4000/Release_Notes/0.4.0_Breaking_Changes.html","headline":"Breaking Changes - Early Preview 2 (v.0.4.0)","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=52f3c2ef1003e9fe35bc8813a5d4baa843da74c1">
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="http://localhost:4000/">virtualization-sdk</a></h1>
+      
+
+      <h1 id="breaking-changes---early-preview-2-v040">Breaking Changes - Early Preview 2 (v.0.4.0)</h1>
+
+<h2 id="new-argument-snapshot_parameters">New Argument <code class="highlighter-rouge">snapshot_parameters</code></h2>
+<p>A new argument <code class="highlighter-rouge">snapshot_parameters</code> was added to the following <strong>staged</strong> plugin operations:</p>
+
+<ul>
+  <li><a href="/References/Plugin_Operations.md#staged-linked-source-pre-snapshot">Staged Linked Source Pre-Snapshot</a></li>
+  <li><a href="/References/Plugin_Operations.md#staged-linked-source-post-snapshot">Staged Linked Source Post-Snapshot</a></li>
+</ul>
+
+<p>This argument will allow the end user to indicate to the plugin whether or not to initiate a full ingestion for a dSource. More details about the new argument are <a href="/Building_Your_First_Plugin/Data_Ingestion.md">here</a>.</p>
+
+<h3 id="what-is-affected">What is affected</h3>
+<p>This argument applies only to <strong>staged</strong> plugins. The plugin’s source code will have to be updated for the following staged plugin operations:</p>
+
+<ul>
+  <li><a href="/References/Plugin_Operations/#staged-linked-source-pre-snapshot">Staged Linked Source Pre-Snapshot</a>: This plugin operation is optional and will need to be updated if the plugin implements it.</li>
+  <li><a href="/References/Plugin_Operations/#staged-linked-source-post-snapshot">Staged Linked Source Post-Snapshot</a>: This plugin operation is required and will need to be updated.</li>
+</ul>
+
+<h3 id="how-does-it-fail">How does it fail</h3>
+<p><a href="/References/CLI.md#build">build</a> will fail with the following error message if the new argument is not added to the affected staged plugin operations:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>dvp build
+Error: Number of arguments <span class="k">do </span>not match <span class="k">in </span>method staged_post_snapshot. Expected: <span class="o">[</span><span class="s1">'staged_source'</span>, <span class="s1">'repository'</span>, <span class="s1">'source_config'</span>, <span class="s1">'snapshot_parameters'</span><span class="o">]</span>, Found: <span class="o">[</span><span class="s1">'repository'</span>, <span class="s1">'source_config'</span>, <span class="s1">'staged_source'</span><span class="o">]</span><span class="nb">.</span>
+Error: Number of arguments <span class="k">do </span>not match <span class="k">in </span>method staged_pre_snapshot. Expected: <span class="o">[</span><span class="s1">'staged_source'</span>, <span class="s1">'repository'</span>, <span class="s1">'source_config'</span>, <span class="s1">'snapshot_parameters'</span><span class="o">]</span>, Found: <span class="o">[</span><span class="s1">'repository'</span>, <span class="s1">'source_config'</span>, <span class="s1">'staged_source'</span><span class="o">]</span><span class="nb">.</span>
+
+0 Warning<span class="o">(</span>s<span class="o">)</span><span class="nb">.</span> 2 Error<span class="o">(</span>s<span class="o">)</span><span class="nb">.</span>
+
+BUILD FAILED.
+</code></pre></div></div>
+
+<h3 id="how-to-fix-it">How to fix it</h3>
+<p>Update the affected staged plugin operations to include the new argument <code class="highlighter-rouge">snapshot_parameters</code>.</p>
+
+<ul>
+  <li>Previous releases</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.linked.pre_snapshot</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">linked_pre_snapshot_prior</span><span class="p">(</span><span class="n">staged_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">source_config</span><span class="p">):</span>
+  <span class="c"># This was the function signature prior to 0.4.0</span>
+  <span class="k">pass</span>
+
+<span class="nd">@plugin.linked.post_snapshot</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">linked_post_snapshot_prior</span><span class="p">(</span><span class="n">staged_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">source_config</span><span class="p">):</span>
+  <span class="c"># This was the function signature prior to 0.4.0</span>
+  <span class="k">return</span> <span class="n">SnapshotDefinition</span><span class="p">()</span>
+</code></pre></div></div>
+
+<ul>
+  <li>0.4.0</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.linked.pre_snapshot</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">linked_pre_snapshot_040</span><span class="p">(</span><span class="n">staged_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">source_config</span><span class="p">,</span> <span class="n">snapshot_parameters</span><span class="p">):</span>
+  <span class="c"># Updated function signature in 0.4.0</span>
+  <span class="k">pass</span>
+
+<span class="nd">@plugin.linked.post_snapshot</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">linked_post_snapshot_040</span><span class="p">(</span><span class="n">staged_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">source_config</span><span class="p">,</span> <span class="n">snapshot_parameters</span><span class="p">):</span>
+  <span class="c"># Updated function signature in 0.4.0</span>
+  <span class="k">return</span> <span class="n">SnapshotDefinition</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<h2 id="stagedsource-properties-modified">StagedSource Properties Modified</h2>
+<p>Properties of the <a href="/References/Classes.md#stagedsource">StagedSource</a> class were modified:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">connection</code> was renamed to <code class="highlighter-rouge">source_connection</code>.</li>
+  <li><code class="highlighter-rouge">staged_connection</code> was added to allow connecting to the staging environment.</li>
+</ul>
+
+<p>This will enable plugins to connect to both the source and staging environments. More details about these properties are <a href="/References/Classes.md#stagedsource">here</a>.</p>
+
+<h3 id="what-is-affected-1">What is affected</h3>
+<p>This change applies only to <strong>staged</strong> plugins.<br /></p>
+
+<h4 id="required-changes">Required Changes</h4>
+<p>The plugin’s source code will have to be updated for any staged plugin operations that accesses the <code class="highlighter-rouge">connection</code> propery of a <a href="/References/Classes.md#stagedsource">StagedSource</a> object.</p>
+
+<h4 id="optional-changes">Optional Changes</h4>
+<p>The plugin can choose to use the new <code class="highlighter-rouge">staged_connection</code> property to connect to the staging environment of a dSource.</p>
+
+<h3 id="how-does-it-fail-1">How does it fail</h3>
+<p>Any Delphix Engine operation that calls a plugin operation that has not been fixed would fail with the following stack trace as part of the output of the user exception:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">AttributeError</span><span class="p">:</span> <span class="s">'StagedSource'</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s">'connection'</span>
+</code></pre></div></div>
+
+<h3 id="how-to-fix-it-1">How to fix it</h3>
+<p>Update any staged plugin operations that access the renamed property.</p>
+
+<ul>
+  <li>Previous releases</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+<span class="kn">from</span> <span class="nn">dlpx.virtualization</span> <span class="kn">import</span> <span class="n">libs</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.linked.pre_snapshot</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">linked_pre_snapshot_prior</span><span class="p">(</span><span class="n">staged_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">source_config</span><span class="p">):</span>
+  <span class="c"># Property name was 'connection' was the name of the property for staged_source prior to 0.4.0</span>
+  <span class="n">libs</span><span class="o">.</span><span class="n">run_bash</span><span class="p">(</span><span class="n">staged_source</span><span class="o">.</span><span class="n">connection</span><span class="p">,</span> <span class="s">'date'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<ul>
+  <li>0.4.0</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+<span class="kn">from</span> <span class="nn">dlpx.virtualization</span> <span class="kn">import</span> <span class="n">libs</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="nd">@plugin.linked.pre_snapshot</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">linked_pre_snapshot_prior</span><span class="p">(</span><span class="n">staged_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">source_config</span><span class="p">):</span>
+  <span class="c"># Property name was updated to 'source_connection' in 0.4.0</span>
+  <span class="n">libs</span><span class="o">.</span><span class="n">run_bash</span><span class="p">(</span><span class="n">staged_source</span><span class="o">.</span><span class="n">source_connection</span><span class="p">,</span> <span class="s">'date'</span><span class="p">)</span>
+</code></pre></div></div>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+    
+  </body>
+</html>

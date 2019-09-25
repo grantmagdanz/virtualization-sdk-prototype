@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Virtualization SDK | virtualization-sdk</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Virtualization SDK" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/Building_Your_First_Plugin/Discovery.html" />
+<meta property="og:url" content="http://localhost:4000/Building_Your_First_Plugin/Discovery.html" />
+<meta property="og:site_name" content="virtualization-sdk" />
+<script type="application/ld+json">
+{"@type":"WebPage","url":"http://localhost:4000/Building_Your_First_Plugin/Discovery.html","headline":"Virtualization SDK","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=52f3c2ef1003e9fe35bc8813a5d4baa843da74c1">
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="http://localhost:4000/">virtualization-sdk</a></h1>
+      
+
+      <h1 id="discovery">Discovery</h1>
+
+<h2 id="what-is-discovery">What is Discovery?</h2>
+<p>In order to ingest data from a source environment, the Delphix Engine first needs to learn information about the data: Where does it live? How can it be accessed? What is it called?</p>
+
+<p><a href="/References/Glossary.md#discovery">Discovery</a> is the process by which the Delphix Engine learns about remote data. Discovery can be either:</p>
+
+<ul>
+  <li><a href="/References/Glossary.md#automatic-discovery">automatic</a> — where the plugin finds the remote data on its own</li>
+  <li><a href="/References/Glossary.md#manual-discovery">manual</a> — where the user tells us about the remote data</li>
+</ul>
+
+<p>For our first plugin, we will be using a mix of these two techniques.</p>
+
+<h2 id="source-configs-and-repositories">Source Configs and Repositories</h2>
+
+<h3 id="what-are-source-configs-and-repositories">What are Source Configs and Repositories?</h3>
+
+<p>A <a href="/References/Glossary.md#source-config">source config</a> is a collection of information that Delphix uses to represent a dataset. Different plugins will have different ideas about what a “dataset” is (an entire database? a set of config files? an application?). For our first plugin, it is simply a directory tree on the filesystem of the remote environment.</p>
+
+<p>A <a href="/References/Glossary.md#repository">repository</a> represents what you might call “data dependencies” – anything installed on the remote host that the dataset depends on. For example, if you are working with a Postgres database, then your repository will represent an installation of a particular version of the Postgres DBMS. In this plugin, we do not have any special dependencies, except for the simple existence of the unix system on which the directory lives.</p>
+
+<p>We will be using automatic discovery for our repositories, and manual discovery for our source configs. This is the default configuration that is created by <code class="highlighter-rouge">dvp init</code>, so there is nothing further we need to do here.</p>
+
+<h3 id="defining-your-data-formats">Defining Your Data Formats</h3>
+<p>Because each plugin will have different ideas about what a repository or source config represents, different plugins will have different sets of information that they need to collect and store.</p>
+
+<p>Delphix needs to know the format of this information. How many pieces of information are collected? What are they called? Are they strings? Numbers?</p>
+
+<p>For our first plugin, we do not need a lot of information. We use no special information about our repositories (except some way for the user to identify them). For source configs, all we need to know is the path to the directory from which we will be ingesting data.</p>
+
+<p>The plugin needs to describe all of this to the Delphix Engine, and it does so using <a href="/References/Glossary.md#schema">schemas</a>.  Recall that when we ran <code class="highlighter-rouge">dvp init</code>, a file full of bare-bones schemas was created. As we build up our first toolkit, we will be augmenting these schemas to serve our needs.</p>
+
+<h4 id="repository-schema">Repository Schema</h4>
+<p>Open up the <code class="highlighter-rouge">schema.json</code> file in your editor/IDE and locate <code class="highlighter-rouge">repositoryDefinition</code>, it should look like this:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="s2">"repositoryDefinition"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w"> </span><span class="p">}</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="s2">"nameField"</span><span class="p">:</span><span class="w"> </span><span class="s2">"name"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"identityFields"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"name"</span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Since we do not have any special dependencies, we can just leave it as-is.</p>
+
+<p>For detailed information about exactly how repository schemas work, see <a href="/References/Schemas.md">the reference page</a>.</p>
+
+<p>In brief, what we are doing here is saying that each of our repositories will have a single property called <code class="highlighter-rouge">name</code>, which will be used both as a unique identifier and as the user-visible name of the repository.</p>
+
+<h4 id="source-config-schema">Source Config Schema</h4>
+
+<p>For source configs, the bare-bones schema is not going to be good enough. Recall that for us, a source config represents a directory tree on a remote environment.</p>
+
+<p>Locate the <code class="highlighter-rouge">sourceConfigDefinition</code> inside the <code class="highlighter-rouge">schema.json</code> file and modify the definition so it looks like this:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s2">"sourceConfigDefinition"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"required"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"name"</span><span class="p">,</span><span class="w"> </span><span class="s2">"path"</span><span class="p">],</span><span class="w">
+    </span><span class="s2">"additionalProperties"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"prettyName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Dataset Name"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"User-visible name for this dataset"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="s2">"path"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"format"</span><span class="p">:</span><span class="w"> </span><span class="s2">"unixpath"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"prettyName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Path"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Full path to data location on the remote environment"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"nameField"</span><span class="p">:</span><span class="w"> </span><span class="s2">"name"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"identityFields"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"path"</span><span class="p">]</span><span class="w">
+</span><span class="p">},</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Now, we have two properties, a property <code class="highlighter-rouge">name</code> serving as the user-visible name of the source config and <code class="highlighter-rouge">path</code> which tells us where the data lives on the remote host. Note  we are using <code class="highlighter-rouge">path</code> as the unique identifier.</p>
+
+<p>Because we are using manual discovery, the end user is going to be responsible for filling in values for <code class="highlighter-rouge">name</code> and <code class="highlighter-rouge">path</code>. So, we have added some things to our schema that we did not need for repositories.</p>
+
+<p>The <code class="highlighter-rouge">prettyName</code> and <code class="highlighter-rouge">description</code> entries will be used by the UI to tell the user what these fields mean.</p>
+
+<p>Because we set <code class="highlighter-rouge">additionalProperties</code> to <code class="highlighter-rouge">false</code>, this will prevent users from supplying properties other than <code class="highlighter-rouge">name</code> and <code class="highlighter-rouge">path</code>.</p>
+
+<p>Finally, we have specified that the <code class="highlighter-rouge">path</code> property must be a well-formatted Unix path. This allows the UI to enforce that the format is correct before the user is allowed to proceed. (Note this only enforces the format, and does not actually check to see if the path really exists on some remote environment!)</p>
+
+<p>Refer to the reference page for <a href="/References/Schemas.md">Schemas</a> for more details about these entries, and for other things that you can do in these schemas.</p>
+
+<h2 id="implementing-discovery-in-your-plugin">Implementing Discovery in Your Plugin</h2>
+
+<h3 id="about-python-code">About Python Code</h3>
+
+<p>As described in the overview section, plugins customize the behavior of the Delphix Engine by providing Python code. Each customizable piece of behavior is called a “plugin operation”. The plugin provides separate Python functions for each of the operations that it wants to customize.</p>
+
+<p>Right now, we are concerned with discovery. There are two customizable operations related to automatic discovery, one for repositories and one for source configs. In both cases, the job of the Python method is to automatically collect whatever information the schemas (see above) require, and to return that information to the Delphix Engine. The Delphix Engine will run these customized operations whenever a new environment is added, or when an existing environment is rediscovered.</p>
+
+<h3 id="a-look-at-the-generated-code">A Look at the Generated Code</h3>
+<p>Recall that the <code class="highlighter-rouge">dvp init</code> command we ran created a file called <code class="highlighter-rouge">src/plugin_runner.py</code>. Open this file in your editor/IDE. You will see that this file already contains a bunch of Python code. Let’s take a look at the first three blocks of code in this file.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Mount</span><span class="p">,</span> <span class="n">MountSpecification</span><span class="p">,</span> <span class="n">Plugin</span>
+
+<span class="kn">from</span> <span class="nn">generated.definitions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">RepositoryDefinition</span><span class="p">,</span>
+    <span class="n">SourceConfigDefinition</span><span class="p">,</span>
+    <span class="n">SnapshotDefinition</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div></div>
+<p>These <code class="highlighter-rouge">import</code> lines make certain functionality available to our Python code. Some of this functionality will
+be used just below, as we implement discovery. Others will be used later on, as we implement
+ingestion and provisioning. Later, you’ll add more <code class="highlighter-rouge">import</code>s to unlock more functionality.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>This line creates a Python object which allows us to define our plugin types. We have the ability to do this because of the <code class="highlighter-rouge">import Plugin</code> statement above.</p>
+
+<p>This object is stored in a variable we have elected to call <code class="highlighter-rouge">plugin</code>. We are free to call this variable anything we want, so long as we also change the <code class="highlighter-rouge">entryPoint</code> line in the <code class="highlighter-rouge">plugin_config.yml</code> file. For this example, we will just leave it as <code class="highlighter-rouge">plugin</code>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#</span>
+<span class="c"># Below is an example of the repository discovery operation.</span>
+<span class="c">#</span>
+<span class="c"># NOTE: The decorators are defined on the 'plugin' object created above.</span>
+<span class="c">#</span>
+<span class="c"># Mark the function below as the operation that does repository discovery.</span>
+<span class="nd">@plugin.discovery.repository</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">repository_discovery</span><span class="p">(</span><span class="n">source_connection</span><span class="p">):</span>
+    <span class="c">#</span>
+    <span class="c"># This is an object generated from the repositoryDefinition schema.</span>
+    <span class="c"># In order to use it locally you must run the 'build -g' command provided</span>
+    <span class="c"># by the SDK tools from the plugin's root directory.</span>
+    <span class="c">#</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">RepositoryDefinition</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">'1e87dc30-3cdb-4f0a-9634-07ce017d20d1'</span><span class="p">)]</span>
+</code></pre></div></div>
+
+<p>This is our first <a href="/References/Plugin_Operations.md">plugin operation</a>. In this case, it’s defining what will happen when the Delphix Engine wants to discover repositories on an environment.  Let’s take a look at this code line-by-line</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@plugin.discovery.repository</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">repository_discovery</span><span class="p">(</span><span class="n">source_connection</span><span class="p">):</span>
+</code></pre></div></div>
+
+<p>This begins the definition of a function called <code class="highlighter-rouge">repository_discovery</code>.</p>
+
+<p>We are using a Python <a href="/References/Glossary.md#decorator">decorator</a> which signals to the Delphix Engine that this is the function which should be called when it is time to do repository discovery. The actual name of the function doesn’t matter here. Note that we are using our <code class="highlighter-rouge">plugin</code> variable here as part of the decorator.</p>
+
+<p>The Delphix Engine will pass us information about the source environment in an argument called <code class="highlighter-rouge">source_connection</code>.</p>
+
+<p>!!! warning
+    The name of this input argument matters. That is, you’ll always need to have an argument called
+    <code class="highlighter-rouge">source_connection</code> here. Each plugin operation has its own set of required argument names. For
+    details on which arguments apply to which operations, see the <a href="/References/Plugin_Operations.md">reference section</a>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">return</span> <span class="p">[</span><span class="n">RepositoryDefinition</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">'1e87dc30-3cdb-4f0a-9634-07ce017d20d1'</span><span class="p">)]</span>
+</code></pre></div></div>
+
+<p>This creates and returns a Python object that corresponds to the format defined by our repository schema. Because out repository has exactly one string property called <code class="highlighter-rouge">name</code>, therefore this Python object has one property called <code class="highlighter-rouge">name</code>.</p>
+
+<p>Notice that the code generator has filled in the value of <code class="highlighter-rouge">name</code> with a random string. This results in a plugin operation that works, but which will not be very helpful for the user. We’ll change this later.</p>
+
+<p>The rest of the file contains more plugin operations, and we’ll be modifying them later.</p>
+
+<h3 id="repository-discovery">Repository Discovery</h3>
+
+<p>Now, we need to modify the provided <a href="/References/Plugin_Operations.md#repository-discovery">repository discovery</a> operation. This operation will examine a remote environment, find any repositories, and return information about them to the Delphix Engine.</p>
+
+<p>As a reminder, our only external dependency on the remote environment is simply the existence of a filesystem. Since every Unix host has a filesystem, that means we will have exactly one repository per remote environment. Therefore, our repository discovery operation can be very simple.</p>
+
+<p>In fact, as we saw above, the default-generated <code class="highlighter-rouge">repository_discovery</code> function does almost exactly what we want – it returns one single repository for any Unix host that it is asked to work with. The only problem with it is that it uses
+unhelpful name.  That’s really easy to change!</p>
+
+<p>Replace or modify <code class="highlighter-rouge">repository_discovery</code> so it looks like this:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@plugin.discovery.repository</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">repository_discovery</span><span class="p">(</span><span class="n">source_connection</span><span class="p">):</span>
+    <span class="n">repository</span> <span class="o">=</span> <span class="n">RepositoryDefinition</span><span class="p">(</span><span class="s">'Repository for our First Plugin'</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">repository</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>!!! tip
+    Be careful to always use consistent indentation in Python code!</p>
+
+<h3 id="source-config-discovery">Source Config Discovery</h3>
+
+<p>For source configs, we will rely solely on manual discovery. Therefore, the user will tell us which directories they want to ingest from. We still have to define a source config discovery operation – it just won’t need to do much.</p>
+
+<p>The job of this operation is to return only source configs associated with the given <code class="highlighter-rouge">repository</code>. This function will be called once per repository. In our case, that means it will only be called once.</p>
+
+<p>Because we want to supply <strong>no</strong> automatically-discovered source configs, this function should simply returns an empty list.</p>
+
+<p>In fact, <code class="highlighter-rouge">dvp init</code> has already generated a function for us that does exactly this.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@plugin.discovery.source_config</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">source_config_discovery</span><span class="p">(</span><span class="n">source_connection</span><span class="p">,</span> <span class="n">repository</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[]</span>
+</code></pre></div></div>
+
+<p>If we wanted to do automatic discovery of source configs, we’d modify this function. But, for our purposes now, the existing code is fine and we don’t need to change anything.</p>
+
+<h2 id="how-to-run-discovery-in-the-delphix-engine">How to Run Discovery in the Delphix Engine</h2>
+
+<p>Let us make sure discovery works!</p>
+
+<ol>
+  <li>
+    <p>Run the <code class="highlighter-rouge">dvp build</code> commands, as before. This will build the plugin, with all of the new changes, and create an artifact.</p>
+  </li>
+  <li>
+    <p>Run <code class="highlighter-rouge">dvp upload -e &lt;engine&gt; -u &lt;user&gt;</code>, as before. This will get all the new changes onto the Delphix Engine.</p>
+  </li>
+  <li>
+    <p>Once the new plugin is uploaded, add a remote unix environment to your engine. To do this, go to <strong>Manage &gt; Environments</strong>, chose <strong>Add Environment</strong> from the menu, answer the questions, and <strong>Submit</strong>. (If you already have an environment set up, you can just refresh it instead).</p>
+  </li>
+</ol>
+
+<p>To keep an eye on this discovery process, you may need to open the <strong>Actions</strong> tab on the UI. If any errors happen, they will be reported here.</p>
+
+<ol>
+  <li>After the automatic discovery process completes, go to the <strong>Databases</strong> tab. You will see an entry for <strong>Repository For Our First Plugin</strong>. This is the repository you created in your Python code.</li>
+</ol>
+
+<p><img src="/Building_Your_First_Plugin/images/PostDiscovery.png" alt="Screenshot" /></p>
+
+<p>Notice that it says <em>No databases found on installation</em>. This is because we chose not to do automatic source config discovery.</p>
+
+<p>However, because we have allowed manual source config discovery, you can add your own entries by clicking the plus sign (<strong>Add Database</strong>). Complete the information in the Add Database dialog and click Add.</p>
+
+<p><img src="/Building_Your_First_Plugin/images/AddDatabase.png" alt="Screenshot" /></p>
+
+<p>This should all look familiar. It is precisely what we defined in our source config schema. As expected, there are two entries, one for our <code class="highlighter-rouge">name</code> property, and one for <code class="highlighter-rouge">path</code>.</p>
+
+<p>For example, in the above screenshot, we are specifying that we want to sync the <code class="highlighter-rouge">/bin</code> directory
+from the remote host, and we want to call it <code class="highlighter-rouge">Binaries</code>. You can pick any directory and name that
+you want.</p>
+
+<p>Once you have added one or more source configs, you will be able to sync. This is covered on the next page.</p>
+
+<p>!!! warning
+    Once you have automatically or manually created source configs, you will not be allowed to modify your plugin’s source config schema. We will cover how to deal with this later in the upgrade section. For now, if you need to change your plugin’s source config schema:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- You will have to delete any source configs you have manually added.
+- Delete the plugin and its corresponding objects (dSources, Virtual Sources, etc) if the source configs were manually discovered.
+</code></pre></div></div>
+
+<p>!!! question “<a href="https://forms.gle/cEWzdTnvi6vNeMT58">Survey</a>”
+    Please fill out this <a href="https://forms.gle/cEWzdTnvi6vNeMT58">survey</a> to give us feedback about this section.</p>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+    
+  </body>
+</html>

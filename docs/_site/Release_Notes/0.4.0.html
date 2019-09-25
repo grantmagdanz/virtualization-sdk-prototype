@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Release - Early Preview 2 (v0.4.0) | virtualization-sdk</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Release - Early Preview 2 (v0.4.0)" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/Release_Notes/0.4.0.html" />
+<meta property="og:url" content="http://localhost:4000/Release_Notes/0.4.0.html" />
+<meta property="og:site_name" content="virtualization-sdk" />
+<script type="application/ld+json">
+{"@type":"WebPage","url":"http://localhost:4000/Release_Notes/0.4.0.html","headline":"Release - Early Preview 2 (v0.4.0)","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=52f3c2ef1003e9fe35bc8813a5d4baa843da74c1">
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="http://localhost:4000/">virtualization-sdk</a></h1>
+      
+
+      <h1 id="release---early-preview-2-v040">Release - Early Preview 2 (v0.4.0)</h1>
+
+<p>To install or upgrade the SDK, refer to instructions <a href="/Getting_Started.md#installation">here</a>.</p>
+
+<h2 id="new--improved">New &amp; Improved</h2>
+
+<ul>
+  <li>Added a new CLI command <a href="/References/CLI.md#download-logs">download-logs</a> to enable downloading plugin generated logs from the Delphix Engine.</li>
+  <li>Added an optional argument named <code class="highlighter-rouge">check</code> to the following <a href="/References/Platform_Libraries.md">platform library</a> functions:
+    <ul>
+      <li><a href="/References/Platform_Libraries.md#run_bash">run_bash</a></li>
+      <li><a href="/References/Platform_Libraries.md#run_powershell">run_powershell</a></li>
+    </ul>
+
+    <p>With <code class="highlighter-rouge">check=true</code>, the platform library function checks the <code class="highlighter-rouge">exit_code</code> and raises an exception if it is non-zero.</p>
+  </li>
+  <li>Modified <a href="/References/CLI.md#init">init</a> to auto-generate default implementations for all required plugin operations.</li>
+  <li>Improved <a href="/References/CLI.md#build">build</a> validation for:
+    <ul>
+      <li>Required <a href="/References/Plugin_Operations.md">plugin operations</a>.</li>
+      <li>Incorrect <a href="/References/Plugin_Operations.md">plugin operation</a> argument names.</li>
+      <li><a href="/References/Plugin_Config.md">Plugin Config</a> <code class="highlighter-rouge">entryPoint</code>: The <code class="highlighter-rouge">entryPoint</code> is now imported during the <a href="/References/CLI.md#build">build</a> as part of the validation.</li>
+      <li><a href="/References/Schemas.md">Schemas</a>: Validated to conform to the <a href="http://json-schema.org/specification-links.html#draft-7">JSON Schema Draft-07 Specification</a>.</li>
+    </ul>
+  </li>
+  <li>Improved runtime validation and error messages for:
+    <ul>
+      <li>Objects returned from <a href="/References/Plugin_Operations.md">plugin operations</a>.</li>
+      <li><a href="/References/Classes.md">Platform Classes</a> during instantiation.</li>
+      <li><a href="/References/Platform_Libraries.md">Platform Library</a> function arguments.</li>
+    </ul>
+  </li>
+  <li>Added support for Docker based plugins by specifying <code class="highlighter-rouge">rootSquashEnabled: false</code> in the <a href="/References/Plugin_Config.md">plugin config</a>.</li>
+  <li>Added Job and thread information to plugin generated log messages to increase diagnosability and observability.</li>
+</ul>
+
+<h2 id="breaking-changes">Breaking Changes</h2>
+
+<ul>
+  <li>A new argument <code class="highlighter-rouge">snapshot_parameters</code> was added to the following <strong>staged</strong> plugin operations:
+    <ul>
+      <li><a href="/References/Plugin_Operations.md#staged-linked-source-pre-snapshot">Staged Linked Source Pre-Snapshot</a></li>
+      <li><a href="/References/Plugin_Operations.md#staged-linked-source-post-snapshot">Staged Linked Source Post-Snapshot</a></li>
+    </ul>
+
+    <p>This argument will allow the end user to indicate to the plugin whether or not to initiate a full ingestion for a dSource. More details about the new argument are <a href="/Building_Your_First_Plugin/Data_Ingestion.md#syncing">here</a>.</p>
+
+    <p><a href="/Release_Notes/0.4.0_Breaking_Changes.md#new-argument-snapshot_parameters"><strong>Detailed steps to detect and make changes.</strong></a></p>
+  </li>
+  <li>Properties of the <a href="/References/Classes.md#stagedsource">StagedSource</a> class were modified:
+    <ul>
+      <li><code class="highlighter-rouge">connection</code> was renamed to <code class="highlighter-rouge">source_connection</code>.</li>
+      <li><code class="highlighter-rouge">staged_connection</code> was added to allow connecting to the staging environment.</li>
+    </ul>
+
+    <p>This will enable plugins to connect to both the source and staging environments. More details about these properties are <a href="/References/Classes.md#stagedsource">here</a>.</p>
+
+    <p><a href="/Release_Notes/0.4.0_Breaking_Changes.md#stagedsource-properties-modified"><strong>Detailed steps to detect and make changes.</strong></a></p>
+  </li>
+</ul>
+
+<h2 id="fixed">Fixed</h2>
+
+<ul>
+  <li>Allow access to nested package resources via <code class="highlighter-rouge">pkgutil.get_data</code>.</li>
+  <li>Fixed Out of Memory exceptions.</li>
+  <li>
+    <p>Fixed missing or incorrectly populated properties for the following classes:</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Class</th>
+          <th>Properties</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="/References/Classes.md#virtualsource">VirtualSource</a></td>
+          <td><code class="highlighter-rouge">mounts</code></td>
+        </tr>
+        <tr>
+          <td><a href="/References/Classes.md#remoteuser">RemoteUser</a></td>
+          <td><code class="highlighter-rouge">name</code></td>
+        </tr>
+        <tr>
+          <td><a href="/References/Classes.md#remoteenvironment">RemoteEnvironment</a></td>
+          <td><code class="highlighter-rouge">name</code></td>
+        </tr>
+        <tr>
+          <td><a href="/References/Classes.md#remotehost">RemoteHost</a></td>
+          <td><code class="highlighter-rouge">name</code> <code class="highlighter-rouge">binary_path</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li>Updated Job warnings during discovery to display the underlying Python exceptions if one is raised by the plugin operations.</li>
+  <li>Recreate the plugin’s log directory if a plugin is deleted and re-uploaded to the Delphix Engine.</li>
+  <li>Mark incorrectly provisioned VDBs as unusable and prevent subsequent Delphix Engine operations on such VDBs.</li>
+  <li>Better error messages when incorrect environment types are used for Platform Libraries.</li>
+  <li>Better error messages when a plugin’s <a href="/References/Schemas.md">schema</a> is updated and the plugin is re-uploaded to the Delphix Engine, with clear instructions on how to proceed.</li>
+  <li>Fixed <a href="/References/CLI.md#build">build</a> failures on Windows.</li>
+</ul>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+    
+  </body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Virtualization SDK | virtualization-sdk</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Virtualization SDK" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/References/Decorators.html" />
+<meta property="og:url" content="http://localhost:4000/References/Decorators.html" />
+<meta property="og:site_name" content="virtualization-sdk" />
+<script type="application/ld+json">
+{"@type":"WebPage","url":"http://localhost:4000/References/Decorators.html","headline":"Virtualization SDK","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=52f3c2ef1003e9fe35bc8813a5d4baa843da74c1">
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="http://localhost:4000/">virtualization-sdk</a></h1>
+      
+
+      <h1 id="decorators">Decorators</h1>
+
+<p>The Virtualization SDK exposes decorators to be able to annotate functions that correspond to each <a href="/References/Plugin_Operations.html">Plugin Operation</a>.
+In the example below, it first instantiates a <code class="highlighter-rouge">Plugin()</code> object, that can then be used to tag plugin operations.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dlpx.virtualization.platform</span> <span class="kn">import</span> <span class="n">Plugin</span>
+
+<span class="c"># Initialize a plugin object</span>
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">()</span>
+
+<span class="c"># Use the decorator to annotate the function that corresponds to the "Virtual Source Start" Plugin Operation</span>
+<span class="nd">@plugin.virtual_source.start</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">my_start</span><span class="p">(</span><span class="n">virtual_source</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">source_config</span><span class="p">):</span>
+  <span class="k">print</span> <span class="s">"running start"</span> 
+</code></pre></div></div>
+
+<p>!!! info
+    Decorators exposed by the Virtualization SDK are inherently python function calls and needs parentheses <code class="highlighter-rouge">()</code> appended at the end.</p>
+
+<p>Assuming the name of the object, is <code class="highlighter-rouge">plugin</code> as above, the table below lists the corresponding decorators for each plugin operation.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Plugin Operation</th>
+      <th>Decorator</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="/References/Plugin_Operations.html#repository-discovery">Repository Discovey</a></td>
+      <td><code class="highlighter-rouge">@plugin.discovery.repository()</code></td>
+    </tr>
+    <tr>
+      <td><a href="/References/Plugin_Operations.html#source-config-discovery">Source Config Discovey</a></td>
+      <td><code class="highlighter-rouge">@plugin.discovery.source_config()</code></td>
+    </tr>
+    <tr>
+      <td><a href="/References/Plugin_Operations.html#direct-linked-source-pre-snapshot">Direct Linked Source Pre-Snapshot</a></td>
+      <td><code class="highlighter-rouge">@plugin.linked.pre_snapshot()</code></td>
+    </tr>
+    <tr>
+      <td><a href="/References/Plugin_Operations.html#direct-linked-source-post-snapshot">Direct Linked Source Post-Snapshot</a></td>
+      <td><code class="highlighter-rouge">@plugin.linked.post_snapshot()</code></td>
+    </tr>
+    <tr>
+      <td><a href="/References/Plugin_Operations.html#staged-linked-source-pre-snapshot">Staged Linked Source Pre-Snapshot</a></td>
+      <td><code class="highlighter-rouge">@plugin.linked.pre_snapshot()</code></td>
+    </tr>
+    <tr>
+      <td><a href="/References/Plugin_Operations.html#linkedsource-post-snapshot">Staged Linked Source Post-Snapshot</a></td>
+      <td><code class="highlighter-rouge">@plugin.linked.post_snapshot()</code></td>
+    </tr>
+    <tr>
+      <td><a href="/References/Plugin_Operations.html#staged-linked-source-start-staging">Staged Linked Source Start-Staging</a></td>
+      <td><code class="highlighter-rouge">@plugin.linked.start_staging()</code></td>
+    </tr>
+    <tr>
+      <td><a href="/References/Plugin_Operations.html#staged-linked-source-stop-staging">Staged Linked Source Stop-Staging</a></td>
+      <td><code class="highlighter-rouge">@plugin.linked.stop_staging()</code></td>
+    </tr>
+    <tr>
+      <td><a href="/References/Plugin_Operations.html#staged-linked-source-status">Staged Linked Source Status</a></td>
+      <td><code class="highlighter-rouge">@plugin.linked.status()</code></td>
+    </tr>
+    <tr>
+      <td><a href="/References/Plugin_Operations.html#staged-linked-source-worker">Staged Linked Source Worker</a></td>
+      <td><code class="highlighter-rouge">@plugin.linked.worker()</code></td>
+    </tr>
+    <tr>
+      <td><a href="/References/Plugin_Operations.html#staged-linked-source-mount-specification">Staged Linked Source Mount Specification</a></td>
+      <td><code class="highlighter-rouge">@plugin.linked.mount_specification()</code></td>
+    </tr>
+    <tr>
+      <td><a href="/References/Plugin_Operations.html#virtual-source-configure">Virtual Source Configure</a></td>
+      <td><code class="highlighter-rouge">@plugin.virtual.configure()</code></td>
+    </tr>
+    <tr>
+      <td><a href="/References/Plugin_Operations.html#virtual-source-unconfigure">Virtual Source Unconfigure</a></td>
+      <td><code class="highlighter-rouge">@plugin.virtual.unconfigure()</code></td>
+    </tr>
+    <tr>
+      <td><a href="/References/Plugin_Operations.html#virtual-source-reconfigure">Virtual Source Reconfigure</a></td>
+      <td><code class="highlighter-rouge">@plugin.virtual.reconfigure()</code></td>
+    </tr>
+    <tr>
+      <td><a href="/References/Plugin_Operations.html#virtual-source-start">Virtual Source Start</a></td>
+      <td><code class="highlighter-rouge">@plugin.virtual.start()</code></td>
+    </tr>
+    <tr>
+      <td><a href="/References/Plugin_Operations.html#virtual-source-stop">Virtual Source Stop</a></td>
+      <td><code class="highlighter-rouge">@plugin.virtual.stop()</code></td>
+    </tr>
+    <tr>
+      <td><a href="/References/Plugin_Operations.html#virtualsource-pre-snapshot">VirtualSource Pre-Snapshot</a></td>
+      <td><code class="highlighter-rouge">@plugin.virtual.pre_snapshot()</code></td>
+    </tr>
+    <tr>
+      <td><a href="/References/Plugin_Operations.html#virtual-source-post-snapshot">Virtual Source Post-Snapshot</a></td>
+      <td><code class="highlighter-rouge">@plugin.virtual.post_snapshot()</code></td>
+    </tr>
+    <tr>
+      <td><a href="/References/Plugin_Operations.html#virtual-source-mount-specification">Virtual Source Mount Specification</a></td>
+      <td><code class="highlighter-rouge">@plugin.virtual.mount_specification()</code></td>
+    </tr>
+    <tr>
+      <td><a href="/References/Plugin_Operations.html#virtual-source-status">Virtual Source Status</a></td>
+      <td><code class="highlighter-rouge">@plugin.virtual.status()</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>!!! warning
+    A plugin should only implement the <strong>direct</strong> operations or the <strong>staged</strong> operations based on the <a href="/References/Glossary.html#plugin-type">plugin type</a></p>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+    
+  </body>
+</html>

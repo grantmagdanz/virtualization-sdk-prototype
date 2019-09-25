@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Error handling in Powershell | virtualization-sdk</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Error handling in Powershell" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/Best_Practices/Working_with_Powershell.html" />
+<meta property="og:url" content="http://localhost:4000/Best_Practices/Working_with_Powershell.html" />
+<meta property="og:site_name" content="virtualization-sdk" />
+<script type="application/ld+json">
+{"@type":"WebPage","url":"http://localhost:4000/Best_Practices/Working_with_Powershell.html","headline":"Error handling in Powershell","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=52f3c2ef1003e9fe35bc8813a5d4baa843da74c1">
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="http://localhost:4000/">virtualization-sdk</a></h1>
+      
+
+      
+<h3 id="error-handling-in-powershell">Error handling in Powershell</h3>
+
+<p>!!! info
+    Commands run via run_powershell are executed as a script. The exit code returned by run_powershell as part of the RunPowershellResult is determined by the exit code from the script.
+PowerShell gives you a few ways to handle errors in your scripts:</p>
+
+<ol>
+  <li>
+    <p>Set $ErrorActionPreference. This only applies to PowerShell Cmdlets. For scripts or other executables such as sqlcmd, PowerShell will return with exit code 0 even if there is an error, regardless of the value of $ErrorActionPrefe       rence. The allowable values for $ErrorActionPreference are:</p>
+
+    <p>Continue (default) – Continue even if there is an error.                          <br />
+   SilentlyContinue – Acts like Continue with the exception that errors are not displayed         <br />
+   Inquire – Prompts the user in case of error          <br />
+   Stop -  Stops execution after the first error</p>
+  </li>
+  <li>
+    <p>Use exception handling by using traps and try/catch blocks or if statements to detect errors and return with non-zero exit codes</p>
+  </li>
+  <li>
+    <p>Use custom error handling that can be invoked after launching each command in the script to correctly detect errors.</p>
+  </li>
+</ol>
+
+<h3 id="examples">Examples</h3>
+
+<p>The following example will show you how setting $ErrorActionPreference will return exit codes</p>
+
+<p>In the below code, <code class="highlighter-rouge">ls nothing123</code> is expected to fail.</p>
+
+<pre><code class="language-Windows">ls nothing123
+Write-Host "Test"
+</code></pre>
+
+<p>Here is the output when the above commands runs  on a remote host and the script will return the value of <code class="highlighter-rouge">$?</code> to be True eventhough the script failed.</p>
+
+<p>```PS C:\Users\dtully\test&gt; ./test1.ps1
+ls : Cannot find path ‘C:\Users\dtully\test\nothing123’ because it does not exist.
+At C:\Users\dtully\test\test1.ps1:1 char:1</p>
+<ul>
+  <li>ls nothing123</li>
+  <li>~~~~~~~~~~~~~
+    <ul>
+      <li>CategoryInfo          : ObjectNotFound: (C:\Users\dtully\test\nothing123:String) [Get-ChildItem], ItemNotFoundEx
+ ception</li>
+      <li>FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.GetChildItemCommand</li>
+    </ul>
+  </li>
+</ul>
+
+<p>PS C:\Users\dtully\test&gt; Write-Host $?
+True</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Now lets set $ErrorActionPreference=Stop.
+
+```Windows
+$ErrorActionPreference = "Stop"
+ls nothing123
+Write-Host "Test"
+</code></pre></div></div>
+<p>Now when we run the command again we see the return value of <code class="highlighter-rouge">$?</code> to be False.</p>
+
+<pre><code class="language-Windows">PS C:\Users\dtully\test&gt; ./test1.ps1
+ls : Cannot find path 'C:\Users\dtully\test\nothing123' because it does not exist.
+At C:\Users\dtully\test\test1.ps1:2 char:1
++ ls nothing123
++ ~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Users\dtully\test\nothing123:String) [Get-ChildItem], ItemNotFoundException
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.GetChildItemCommand
+
+PS C:\Users\dtully\test&gt; Write-Host $?
+False
+</code></pre>
+
+<p>The following example shows how you can use the function verifySuccess to detect whether the previous command failed, and if it did print, print an error message and return with an exit code of 1.</p>
+
+<pre><code class="language-Windows">function die {
+    Write-Error "Error: $($args[0])"
+    exit 1
+}
+ 
+function verifySuccess {
+    if (!$?) {
+        die "$($args[0])"
+    }
+}
+ 
+Write-Output "I'd rather be in Hawaii"
+verifySuccess "WRITE_OUTPUT_FAILED"
+ 
+&amp; C:\Program Files\Delphix\scripts\myscript.ps1
+verifySuccess "MY_SCRIPT_FAILED"
+</code></pre>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+    
+  </body>
+</html>
