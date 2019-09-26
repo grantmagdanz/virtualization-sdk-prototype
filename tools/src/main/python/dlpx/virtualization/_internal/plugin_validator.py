@@ -137,17 +137,20 @@ class PluginValidator:
                     if hasattr(err, "problem_mark"):
                         mark = err.problem_mark
                         raise exceptions.UserError(
-                            'Command failed because the plugin config file '
-                            'provided as input \'{}\' was not valid yaml. '
-                            'Verify the file contents. '
-                            'Error position: {}:{}'.format(
-                                self.__plugin_config, mark.line + 1,
-                                mark.column + 1))
+                            "Command failed because the plugin config file "
+                            "provided as input '{}' was not valid yaml. "
+                            "Verify the file contents. "
+                            "Error position: {}:{}".format(
+                                self.__plugin_config, mark.line + 1, mark.column + 1
+                            )
+                        )
         except (IOError, OSError) as err:
             raise exceptions.UserError(
-                'Unable to read plugin config file \'{}\''
-                '\nError code: {}. Error message: {}'.format(
-                    self.__plugin_config, err.errno, os.strerror(err.errno)))
+                "Unable to read plugin config file '{}'"
+                "\nError code: {}. Error message: {}".format(
+                    self.__plugin_config, err.errno, os.strerror(err.errno)
+                )
+            )
 
     def __validate_plugin_config_content(self):
         """
@@ -180,16 +183,19 @@ class PluginValidator:
                     plugin_schema = json.load(f)
                 except ValueError as err:
                     raise exceptions.UserError(
-                        'Failed to load schemas because {} is not a '
-                        'valid json file. Error: {}'.format(
-                            self.__plugin_config_schema, err))
+                        "Failed to load schemas because {} is not a "
+                        "valid json file. Error: {}".format(
+                            self.__plugin_config_schema, err
+                        )
+                    )
 
         except (IOError, OSError) as err:
             raise exceptions.UserError(
-                'Unable to read plugin config schema file {}'
-                '\nError code: {}. Error message: {}'.format(
-                    self.__plugin_config_schema, err.errno,
-                    os.strerror(err.errno)))
+                "Unable to read plugin config schema file {}"
+                "\nError code: {}. Error message: {}".format(
+                    self.__plugin_config_schema, err.errno, os.strerror(err.errno)
+                )
+            )
 
         # Convert plugin config content to json
         plugin_config_json = json.loads(json.dumps(self.__plugin_config_content))
