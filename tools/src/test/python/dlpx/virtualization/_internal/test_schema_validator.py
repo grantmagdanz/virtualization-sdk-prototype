@@ -326,42 +326,41 @@ class TestSchemaValidator:
 
     @staticmethod
     @pytest.mark.parametrize(
-        'source_config_definition', [{
-            'type': 'object',
-            'required': ['name', 'path'],
-            'additionalProperties': False,
-            'properties': {
-                'name': {
-                    'type': 'string'
+        "source_config_definition",
+        [
+            {
+                "type": "object",
+                "required": ["name", "path"],
+                "additionalProperties": False,
+                "properties": {
+                    "name": {"type": "string"},
+                    "path": {"type": "string"},
+                    "repoArray": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "prettyName": "Repo Array Type",
+                            "properties": {
+                                "repoArrayStringValue": {
+                                    "type": "strings",
+                                    "prettyName": "Repo Array String Value",
+                                    "description": "A string value.",
+                                }
+                            },
+                        },
+                    },
                 },
-                'path': {
-                    'type': 'string'
-                },
-                "repoArray": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "prettyName": "Repo Array Type",
-                        "properties": {
-                            "repoArrayStringValue": {
-                                "type": "strings",
-                                "prettyName": "Repo Array String Value",
-                                "description": "A string value."
-                            }
-                        }
-                    }
-                }
-            },
-            'nameField': 'name',
-            'identityFields': ['name']
-        }])
+                "nameField": "name",
+                "identityFields": ["name"],
+            }
+        ],
+    )
     def test_bad_type_in_array(schema_file):
         with pytest.raises(exceptions.SchemaValidationError) as err_info:
-            validator = SchemaValidator(schema_file,
-                                        util_classes.PLUGIN_SCHEMA,
-                                        ValidationMode.ERROR)
+            validator = SchemaValidator(
+                schema_file, util_classes.PLUGIN_SCHEMA, ValidationMode.ERROR
+            )
             validator.validate()
 
         message = err_info.value.message
-        assert (
-            "'strings' is not valid under any of the given schemas" in message)
+        assert "'strings' is not valid under any of the given schemas" in message
