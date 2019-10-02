@@ -1,9 +1,6 @@
 name: Release
 
-on:
-  push:
-    branches:
-      - refs/tags/*
+on: [issues]
     
 jobs:
   test:
