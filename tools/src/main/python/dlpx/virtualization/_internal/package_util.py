@@ -41,15 +41,14 @@ def _get_settings():
     return parser
 
 
-@_run_once
 def get_version():
     """Returns the version of the dlpx.virtualization._internal package."""
-    return _get_settings().get("General", "package_version")
+    return virtualization_internal.__version__
 
 
 def get_build_api_version():
     """Returns the sdk build version in the format build command expects"""
-    major, minor, micro = (int(n) for n in get_version().split("."))
+    major, minor, micro, _ = (int(n) for n in get_version().split("."))
     build_api_version = {
         "type": "APIVersion",
         "major": major,
