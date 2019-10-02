@@ -13,13 +13,11 @@ jobs:
       - uses: actions/setup-python@v1
         with:
             python-version: '3.7'
-      - uses: dschep/install-pipenv-action@v1
+      - name: Install pipenv
+        run: pip3 install --upgrade pip pipenv
       - name: Setup environment
         working-directory: docs/
-        run: pipenv --python 3.7 install
+        run: pipenv install
       - name: Publish docs
         working-directory: docs/
-        run: |
-            pipenv run which mkdocs
-            ls `pipenv run which python`
-            pipenv run mkdocs gh-deploy
+        run: pipenv run mkdocs gh-deploy
