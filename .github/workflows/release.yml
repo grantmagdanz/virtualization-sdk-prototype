@@ -27,10 +27,9 @@ jobs:
       
       - name: Build Python package
         working-directory: ${{ matrix.package }}
-        run: |
-          python setup.py sdist bdist_wheel
+        run: python setup.py sdist bdist_wheel
       
       - name: Publish distribution to Test PyPI
         working-directory: ${{ matrix.package }}
         run: |
-          twine upload --repository-url https://test.pypi.org/legacy/ -u __token__ -p ${{ secrets.fake_secret }}
+          twine upload --repository-url https://test.pypi.org/legacy/ -u __token__ -p ${{ secrets.fake_secret }} dist/
