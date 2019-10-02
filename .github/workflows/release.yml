@@ -15,6 +15,12 @@ jobs:
             python-version: '3.7'
       - name: Install mkdocs
         run: pip install mkdocs mkdocs-material markdown-include mkdocs-awesome-pages-plugin
-      - name: Publish docs
+      - name: Build docs
         working-directory: docs/
-        run: mkdocs gh-deploy
+        run: mkdocs build
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v2.4.0
+        env:
+            ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+            PUBLISH_BRANCH: gh-pages
+            PUBLISH_DIR: docs/site
