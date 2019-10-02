@@ -29,4 +29,5 @@ jobs:
       - name: Publish distribution to Test PyPI
         working-directory: ${{ matrix.package }}
         run: |
-          twine upload --repository-url https://test.pypi.org/legacy/ -u __token__ -p ${{ secrets.pypi_password }} dist/
+          twine upload --repository-url https://test.pypi.org/legacy/ -u __token__ -p ${{ secrets.pypi_password }} dist/*.tar.gz
+          twine upload --repository-url https://test.pypi.org/legacy/ -u __token__ -p ${{ secrets.pypi_password }} dist/*.wheel
