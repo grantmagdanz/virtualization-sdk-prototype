@@ -20,7 +20,7 @@ jobs:
           python-version: 2.7
       
       - name: Install twine and wheel
-      - run: pip install twine wheel
+        run: pip install twine wheel
       
       - name: Build Python package
         working-directory: ${{ matrix.package }}
