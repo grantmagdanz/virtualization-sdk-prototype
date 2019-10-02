@@ -30,4 +30,4 @@ jobs:
         working-directory: ${{ matrix.package }}
         run: |
           twine upload --repository-url https://test.pypi.org/legacy/ -u __token__ -p ${{ secrets.pypi_password }} dist/*.tar.gz
-          twine upload --repository-url https://test.pypi.org/legacy/ -u __token__ -p ${{ secrets.pypi_password }} dist/*.wheel
+          twine upload --repository-url https://test.pypi.org/legacy/ -u __token__ -p ${{ secrets.pypi_password }} dist/*.whl
