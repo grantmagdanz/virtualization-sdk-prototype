@@ -1,6 +1,6 @@
 # Welcome!
 
-Hey there! With this Delphix Virtualization SDK documentation we hope you will find all you need to know in order to develop your own plugins!
+Hey there, SDK team! With this Delphix Virtualization SDK documentation we hope you will find all you need to know in order to develop your own plugins!
 
 ## Overview
 
