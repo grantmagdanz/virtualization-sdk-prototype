@@ -1,4 +1,4 @@
 dvp-common==1.0.0
 enum34==1.1.6 ; python_version < '3.4'
-protobuf==3.6.1
+protobuf==3.10.0
 six==1.12.0
