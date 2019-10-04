@@ -12,7 +12,7 @@ install_requires = [
   "flake8 >= 3.6",
   "jinja2 >= 2.10",
   "jsonschema >= 3",
-  "protobuf == 3.6.1",
+  "protobuf == 3.10.0",
   "pyyaml >= 3",
   "requests >= 2.21.0",
   "typing;python_version < '3.5'",
